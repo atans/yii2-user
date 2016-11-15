@@ -1,6 +1,6 @@
-Yii2 RBAC Extension
+Yii2 User Extension
 ===================
-An RBAC extension for yii2
+An user extension for yii2
 
 Installation
 ------------
@@ -10,13 +10,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-composer atans/yii2-rbac "*"
+composer atans/yii2-user "*"
 ```
 
 or add
 
 ```
-"atans/yii2-rbac": "*"
+"atans/yii2-user": "*"
 ```
 
 to the require section of your `composer.json` file.
@@ -30,5 +30,5 @@ Usage
     // config/main.php
 
     'modules' => [
-        'rbac' => 'atans\rbac\Module',
+        'rbac' => 'atans\user\Module',
     ],
