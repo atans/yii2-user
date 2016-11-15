@@ -1,0 +1,24 @@
+{
+    "name": "atans/yii2-user",
+    "description": "An user extension for yii2",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","user"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "atans",
+            "email": "atans.chiu@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "atans\\user\\": ""
+        }
+    },
+    "extra": {
+        "bootstrap": "atans\\user\\Bootstrap"
+    }
+}
