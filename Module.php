@@ -6,8 +6,15 @@ use atans\user\models\User;
 
 class Module extends \yii\base\Module
 {
-
+    /**
+     * @var bool
+     */
     public $enableRegistration = true;
+
+    /**
+     * @var bool
+     */
+    public $enableAutoLogin = true;
 
     /**
      * @var string
@@ -48,7 +55,7 @@ class Module extends \yii\base\Module
     /**
      * @var string
      */
-    public $defaultStatus = User::STATUS_ACTIVE;
+    public $defaultStatus = models\User::STATUS_ACTIVE;
 
     /**
      * @var bool
@@ -75,5 +82,11 @@ class Module extends \yii\base\Module
      * @var array
      */
     public $modelMap = [];
+
+
+    /**
+     * @var array Login url
+     */
+    public $loginUrl = ['/user/login'];
 
 }
