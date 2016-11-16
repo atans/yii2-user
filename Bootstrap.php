@@ -10,9 +10,9 @@ use yii\i18n\PhpMessageSource;
 class Bootstrap implements BootstrapInterface
 {
     private $modelMap = [
-        'User'         => 'atans\models\User',
-        'LoginForm'    => 'atans\models\LoginForm',
-        'RegisterForm' => 'atans\models\RegisterForm',
+        'User'         => 'atans\user\models\User',
+        'LoginForm'    => 'atans\user\models\LoginForm',
+        'RegisterForm' => 'atans\user\models\RegisterForm',
     ];
 
     /**
@@ -33,12 +33,15 @@ class Bootstrap implements BootstrapInterface
                 $module->modelMap[$name] = $modelName;
 
                 if (in_array($name, ['User'])) {
-                    Yii::$container->setSingleton(Finder::className(), [
-                        'userQuery' =>  $modelName::find(),
-                    ]);
+                    Yii::$container->set($name . 'Query', function () use ($modelName) {
+                        return $modelName::find();
+                    });
                 }
-
             }
+
+            Yii::$container->setSingleton(Finder::className(), [
+                'userQuery' =>  Yii::$container->get('UserQuery'),
+            ]);
         }
 
         if ($app instanceof ConsoleApplication) {
