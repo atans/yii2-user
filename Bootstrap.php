@@ -4,6 +4,7 @@ namespace atans\User;
 
 use Yii;
 use yii\base\BootstrapInterface;
+use yii\console\Application as ConsoleApplication;
 use yii\i18n\PhpMessageSource;
 
 class Bootstrap implements BootstrapInterface
@@ -19,13 +20,6 @@ class Bootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        if (! isset($app->i18n->translations['user*'])) {
-            $app->i18n->translations['user*'] = [
-                'class'    => PhpMessageSource::className(),
-                'basePath' => __DIR__ . '/messages',
-            ];
-        }
-
         /* @var $module Module */
         /* @var $modelName \yii\db\ActiveRecord */
         if ($app->hasModule('user') && ($module = $app->getModule('user')) instanceof Module) {
@@ -45,6 +39,23 @@ class Bootstrap implements BootstrapInterface
                 }
 
             }
+        }
+
+        if ($app instanceof ConsoleApplication) {
+
+        } else {
+            if (! isset($app->i18n->translations['user*'])) {
+                $app->i18n->translations['user*'] = [
+                    'class'    => PhpMessageSource::className(),
+                    'basePath' => __DIR__ . '/messages',
+                ];
+            }
+
+            Yii::$container->set('yii\web\User', [
+                'enableAutoLogin' => $module->enableAutoLogin,
+                'loginUrl'        => $module->loginUrl,
+                'identityClass'   => $module->modelMap['User'],
+            ]);
         }
     }
 }
