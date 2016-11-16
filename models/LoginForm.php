@@ -45,8 +45,8 @@ class LoginForm extends Model
     {
         return [
             ['identity', 'required'],
-            ['password', 'required'],
 
+            ['password', 'required'],
             ['password', 'validatePassword'],
 
             ['rememberMe', 'boolean'],
