@@ -1,6 +1,6 @@
 <?php
 
-namespace atans\User;
+namespace atans\user;
 
 use Yii;
 use yii\base\BootstrapInterface;
