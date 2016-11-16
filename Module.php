@@ -35,6 +35,17 @@ class Module extends \yii\base\Module
     public $passwordMinLength = 6;
 
     /**
+     * @var bool
+     */
+    public $enableGeneratingPassword = false;
+
+    /**
+     * @see http://php.net/manual/en/function.password-hash.php
+     * @var int
+     */
+    public $passwordCost = null;
+
+    /**
      * @var string
      */
     public $defaultStatus = User::STATUS_ACTIVE;
@@ -64,7 +75,5 @@ class Module extends \yii\base\Module
      * @var array
      */
     public $modelMap = [];
-
-
 
 }
