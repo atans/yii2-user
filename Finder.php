@@ -14,6 +14,17 @@ class Finder extends Object
     protected $userQuery;
 
     /**
+     * Find user by id
+     *
+     * @param int $id
+     * @return array|null|\yii\db\ActiveRecord
+     */
+    public function findUserById($id)
+    {
+        return $this->findUser(['id' => $id])->one();
+    }
+
+    /**
      * Find user by username or email
      *
      * @param string $usernameOrEmail

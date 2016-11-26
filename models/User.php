@@ -42,11 +42,13 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_BLOCKED = 'blocked';
 
 
-    const BEFORE_CREATE = 'before_create';
-    const AFTER_CREATE = 'before_create';
+    const EVENT_BEFORE_CREATE = 'before_create';
+    const EVENT_AFTER_CREATE = 'before_create';
 
-    const BEFORE_REGISTER = 'before_register';
-    const AFTER_REGISTER = 'after_register';
+    const EVENT_BEFORE_REGISTER = 'before_register';
+    const EVENT_AFTER_REGISTER = 'after_register';
+
+    private $password;
 
     /**
      * @inheritdoc
@@ -83,7 +85,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['username', 'required'],
             ['username', 'trim'],
-            ['username', 'filter', 'filter'=>'strtolower'],
+            ['username', 'filter', 'filter' => 'strtolower'],
             ['username', 'match', 'pattern' => $module->usernamePattern],
             ['username', 'unique'],
             ['username', 'string', 'min' => $module->usernameMinLength, 'max' => $module->usernameMaxLength],
@@ -95,10 +97,11 @@ class User extends ActiveRecord implements IdentityInterface
             ['email', 'string', 'max' => $module->emailMaxLength],
             ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used')],
 
-            ['password', 'required'],
+            ['password', 'required', 'on' => [self::SCENARIO_REGISTER, self::SCENARIO_CREATE]],
             ['password', 'string', 'min' => $module->passwordMinLength],
 
-            ['status', 'filter', 'filter'=>'strtolower'],
+            ['status', 'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            ['status', 'filter', 'filter' => 'strtolower'],
             ['status', 'in', 'range' => self::getStatuses()],
 
             ['created_at', 'date', 'format' => 'php:Y-m-d H:i:s'],
@@ -265,7 +268,13 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function setPassword($password)
     {
+        $this->password = $password;
         $this->password_hash = Yii::$app->security->generatePasswordHash($password, $this->getModule()->passwordCost);
+    }
+
+    public function getPassword()
+    {
+        return $this->password;
     }
 
     /**
@@ -297,6 +306,28 @@ class User extends ActiveRecord implements IdentityInterface
         return (bool) $this->updateAttributes(['status' => self::STATUS_BLOCKED]);
     }
 
+    public function getIsBlocked()
+    {
+        return $this->status == self::STATUS_BLOCKED;
+    }
+
+    /**
+     * Check user is admin or not
+     *
+     * @return bool
+     */
+    public function getIsAdmin()
+    {
+        if (Yii::$app->getAuthManager()
+            && $this->getModule()->adminPermission
+            && Yii::$app->user->can($this->getModule()->adminPermission)
+        ) {
+            return true;
+        }
+
+        return in_array($this->username, $this->getModule()->admins);
+    }
+
     /**
      * Create user
      *
@@ -317,7 +348,7 @@ class User extends ActiveRecord implements IdentityInterface
                 $this->password = Yii::$app->security->generateRandomString(8);
             }
 
-            $this->trigger(self::BEFORE_CREATE);
+            $this->trigger(self::EVENT_BEFORE_CREATE);
 
             if (! $this->save()) {
                 $transaction->rollBack();
@@ -325,7 +356,7 @@ class User extends ActiveRecord implements IdentityInterface
 
             $transaction->commit();
 
-            $this->trigger(self::AFTER_CREATE);
+            $this->trigger(self::EVENT_AFTER_CREATE);
 
             return true;
 
@@ -354,10 +385,10 @@ class User extends ActiveRecord implements IdentityInterface
             $this->status = $this->getModule()->defaultStatus;
 
             if ($this->getModule()->enableGeneratingPassword && is_null($this->password)) {
-                $this->password = Yii::$app->security->generateRandomString(8);
+                $this->setPassword(Yii::$app->security->generateRandomString(8));
             }
 
-            $this->trigger(self::BEFORE_REGISTER);
+            $this->trigger(self::EVENT_BEFORE_REGISTER);
 
             if (! $this->save()) {
                 $transaction->rollBack();
@@ -365,7 +396,7 @@ class User extends ActiveRecord implements IdentityInterface
 
             $transaction->commit();
 
-            $this->trigger(self::AFTER_REGISTER);
+            $this->trigger(self::EVENT_AFTER_REGISTER);
 
             return true;
 
@@ -381,6 +412,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function beforeSave($insert)
     {
         if ($this->isNewRecord) {
+            $this->generateAuthKey();
             if (Yii::$app instanceof WebApplication) {
                 $this->setAttribute('registration_ip', Yii::$app->request->userIP);
             }

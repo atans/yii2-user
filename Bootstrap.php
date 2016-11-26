@@ -10,9 +10,10 @@ use yii\i18n\PhpMessageSource;
 class Bootstrap implements BootstrapInterface
 {
     private $modelMap = [
-        'User'         => 'atans\user\models\User',
-        'LoginForm'    => 'atans\user\models\LoginForm',
-        'RegisterForm' => 'atans\user\models\RegisterForm',
+        'User'             => 'atans\user\models\User',
+        'LoginForm'        => 'atans\user\models\LoginForm',
+        'RegistrationForm' => 'atans\user\models\RegistrationForm',
+        'UserSearch'       => 'atans\user\models\UserSearch',
     ];
 
     /**
@@ -59,6 +60,13 @@ class Bootstrap implements BootstrapInterface
                 'loginUrl'        => $module->loginUrl,
                 'identityClass'   => $module->modelMap['User'],
             ]);
+
+            $urlRules = [];
+            foreach ($module->urlRules as $urlRule) {
+                $urlRules[] = Yii::createObject($urlRule);
+            }
+
+            $app->urlManager->addRules($urlRules, false);
         }
     }
 }

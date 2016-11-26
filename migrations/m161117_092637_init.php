@@ -1,8 +1,7 @@
 <?php
 
-use yii\db\Migration;
 
-class m161116_135901_init extends Migration
+class m161117_092637_init extends \atans\user\migrations\Migration
 {
     public function up()
     {
@@ -17,7 +16,7 @@ class m161116_135901_init extends Migration
             'status' => $this->string(32)->notNull(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime()->notNull(),
-        ]);
+        ], $this->tableOptions);
     }
 
     public function down()

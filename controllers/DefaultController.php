@@ -2,9 +2,8 @@
 
 namespace atans\user\controllers;
 
-use atans\user\models\LoginForm;
-use atans\user\models\RegisterForm;
 use atans\user\traits\ModuleTrait;
+use atans\user\traits\AjaxValidationTrait;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -12,6 +11,16 @@ use yii\web\NotFoundHttpException;
 
 class DefaultController extends Controller
 {
+    const EVENT_BEFORE_LOGIN = 'before_login';
+    const EVENT_AFTER_LOGIN  = 'after_login';
+
+    const EVENT_BEFORE_REGISTER = 'before_register';
+    const EVENT_AFTER_REGISTER  = 'after_register';
+
+    const EVENT_BEFORE_LOGOUT = 'before_logout';
+    const EVENT_AFTER_LOGOUT = 'after_logout';
+
+    use AjaxValidationTrait;
     use ModuleTrait;
 
     /**
@@ -22,31 +31,14 @@ class DefaultController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index'],
                 'rules' => [
-                    [
-                        'actions' => ['index'],
-                        'allow' => true,
-                        'roles' => ['?'],
-                    ],
+                    ['allow' => true, 'actions' => ['login', 'register', ''], 'roles' => ['?']],
+                    ['allow' => true, 'actions' => ['logout'], 'roles' => ['@']],
                 ],
             ],
         ];
     }
 
-    public function actionRegister()
-    {
-        if (! $this->getModule()->enableRegistration) {
-            throw new NotFoundHttpException();
-        }
-
-        /** @var $model RegisterForm */
-        $model = Yii::createObject(RegisterForm::className());
-
-        return $this->render('register', [
-            'model'  => $model,
-        ]);
-    }
 
     public function actionLogin()
     {
@@ -54,10 +46,15 @@ class DefaultController extends Controller
             return $this->goHome();
         }
 
-        /** @var $model LoginForm */
-        $model = Yii::createObject(LoginForm::className());
+        /** @var $model \atans\user\models\LoginForm */
+        $model = Yii::createObject($this->getModule()->modelMap['LoginForm']);
 
+        $this->performAjaxValidation($model);
+
+        $this->trigger(self::EVENT_BEFORE_LOGIN);
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            $this->trigger(self::EVENT_AFTER_LOGIN);
+
             return $this->goBack();
         }
 
@@ -66,9 +63,41 @@ class DefaultController extends Controller
         ]);
     }
 
+    public function actionRegister()
+    {
+        if (! $this->getModule()->enableRegistration) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var $model \atans\user\models\RegistrationForm */
+        $model = Yii::createObject($this->getModule()->modelMap['RegistrationForm']);
+
+        $this->performAjaxValidation($model);
+
+        $this->trigger(self::EVENT_BEFORE_REGISTER);
+        if ($model->load(Yii::$app->request->post()) && $model->register()) {
+            $this->trigger(self::EVENT_AFTER_REGISTER);
+
+            Yii::$app->session->setFlash('success', Yii::t('user', 'Your account has been created.'));
+
+            if ($this->getModule()->redirectUrlAfterRegistration) {
+                return $this->redirect($this->getModule()->redirectUrlAfterRegistration);
+            }
+
+            return $this->goHome();
+        }
+
+        return $this->render('register', [
+            'model'  => $model,
+        ]);
+    }
+
     public function actionLogout()
     {
+        $this->trigger(self::EVENT_BEFORE_LOGOUT);
         Yii::$app->getUser()->logout();
+        $this->trigger(self::EVENT_AFTER_LOGOUT);
+
         return $this->goHome();
     }
 }

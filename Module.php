@@ -2,9 +2,11 @@
 
 namespace atans\user;
 
-use atans\user\models\User;
+use Yii;
+use yii\base\Module as BaseModule;
+use yii\filters\AccessControl;
 
-class Module extends \yii\base\Module
+class Module extends BaseModule
 {
     /**
      * @var bool
@@ -12,14 +14,14 @@ class Module extends \yii\base\Module
     public $enableRegistration = true;
 
     /**
-     * @var bool
+     * @var string default @web
      */
-    public $enableAutoLogin = true;
+    public $redirectUrlAfterRegistration;
 
     /**
      * @var string
      */
-    public $usernamePattern = '/^[a-z0-9_-\.]{3,15}$/';
+    public $usernamePattern = '/^[a-z0-9_\-\.]+$/i';
 
     /**
      * @var int
@@ -70,23 +72,39 @@ class Module extends \yii\base\Module
     /**
      * @var array
      */
+    public $modelMap = [];
+
+    /**
+     * @var bool
+     */
+    public $enableAutoLogin = true;
+
+    /**
+     * @var array Login url
+     */
+    public $loginUrl = ['/user/login'];
+
+    /**
+     * @var array
+     */
+    public $urlRules = [
+        [
+            'class' => 'yii\web\GroupUrlRule',
+            'prefix' => 'user',
+            'rules' => [
+                '<action:(login|register|logout)>'    => 'default/<action>',
+            ],
+        ],
+    ];
+
+    /**
+     * @var array
+     */
     public $admins = [];
 
     /**
      * @var array
      */
     public $adminPermission = [];
-
-
-    /**
-     * @var array
-     */
-    public $modelMap = [];
-
-
-    /**
-     * @var array Login url
-     */
-    public $loginUrl = ['/user/login'];
 
 }

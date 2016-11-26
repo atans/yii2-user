@@ -4,20 +4,15 @@ namespace atans\user\models;
 use atans\user\traits\ModuleTrait;
 use Yii;
 use yii\base\Model;
-use common\models\User;
-use yii\rbac\DbManager;
 
-/**
- * Register form
- */
-class RegisterForm extends Model
+class RegistrationForm extends Model
 {
     use ModuleTrait;
 
     public $username;
     public $email;
     public $password;
-    public $password_repeat;
+    public $passwordRepeat;
 
     /**
      * @inheritdoc
@@ -27,32 +22,37 @@ class RegisterForm extends Model
         $module = $this->getModule();
 
         return [
-            ['username', 'trim'],
             ['username', 'required'],
+            ['username', 'trim'],
+            ['username', 'filter', 'filter' => 'strtolower'],
             ['username', 'unique', 'targetClass' => $module->modelMap['User'], 'message' => Yii::t('user', 'This username has already been taken.')],
             ['username', 'string', 'min' => $module->usernameMinLength, 'max' => $module->usernameMaxLength],
             ['username', 'match', 'pattern' => $module->usernamePattern],
 
-            ['email', 'trim'],
             ['email', 'required'],
+            ['email', 'trim'],
+            ['email', 'filter', 'filter'=>'strtolower'],
             ['email', 'email'],
-            ['email', 'string', 'max' => 255],
+            ['email', 'string', 'max' => $module->emailMaxLength],
             ['email', 'unique', 'targetClass' => $module->modelMap['User'], 'message' => Yii::t('user', 'This email address has already been taken.')],
 
             ['password', 'required'],
             ['password', 'string', 'min' => $module->passwordMinLength],
 
-            ['password_repeat', 'compare', 'compareAttribute' => 'password'],
+            ['passwordRepeat', 'compare', 'compareAttribute' => 'password'],
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels()
     {
         return [
-            'username' => Yii::t('user', 'Username'),
-            'email' => Yii::t('user', 'Email'),
-            'password' => Yii::t('user', 'Password'),
-            'password_repeat' => Yii::t('user', 'Password repeat'),
+            'username'       => Yii::t('user', 'Username'),
+            'email'          => Yii::t('user', 'Email'),
+            'password'       => Yii::t('user', 'Password'),
+            'passwordRepeat' => Yii::t('user', 'Password Repeat'),
         ];
     }
 
@@ -67,16 +67,17 @@ class RegisterForm extends Model
             return null;
         }
 
-        $user           = new User();
-        $user->username = $this->username;
-        $user->email    = $this->email;
-        $user->setPassword($this->password);
-        $user->generateAuthKey();
+        /* @var $user User */
+        $user = Yii::createObject([
+            'class' => $this->getModule()->modelMap['User'],
+            'scenario' => User::SCENARIO_REGISTER,
+        ]);
+        $user->setAttributes($this->getAttributes());
 
-        $user->status = $this->getModule()->defaultStatus;
+        if (! $user->register()) {
+            return false;
+        }
 
-        $user->save();
-
-         return $user;
+        return true;
     }
 }
