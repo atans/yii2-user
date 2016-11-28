@@ -44,7 +44,6 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_PENDING = 'pending';
     const STATUS_BLOCKED = 'blocked';
 
-
     const EVENT_BEFORE_CREATE = 'before_create';
     const EVENT_AFTER_CREATE  = 'before_create';
 
