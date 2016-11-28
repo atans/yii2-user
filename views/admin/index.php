@@ -9,7 +9,7 @@ use yii\grid\GridView;
 /* @var $model atans\user\models\User */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('user', 'User Management');
+$this->title = Yii::t('user', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="bank-index">

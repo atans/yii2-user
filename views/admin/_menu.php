@@ -23,24 +23,5 @@ use yii\bootstrap\Nav;
             'url'   => ['/rbac/permission/index'],
             'visible' => isset(Yii::$app->extensions['atans/yii2-rbac']),
         ],
-        [
-            'label' => Yii::t('user', 'Create'),
-            'items' => [
-                [
-                    'label'   => Yii::t('user', 'New user'),
-                    'url'     => ['/user/admin/create'],
-                ],
-                [
-                    'label' => Yii::t('user', 'New role'),
-                    'url'   => ['/rbac/role/create'],
-                    'visible' => isset(Yii::$app->extensions['atans/yii2-rbac']),
-                ],
-                [
-                    'label' => Yii::t('user', 'New permission'),
-                    'url'   => ['/rbac/permission/create'],
-                    'visible' => isset(Yii::$app->extensions['atans/yii2-rbac']),
-                ],
-            ],
-        ],
     ],
 ]) ?>

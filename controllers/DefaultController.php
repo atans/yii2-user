@@ -33,7 +33,7 @@ class DefaultController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     ['allow' => true, 'actions' => ['login', 'register', ''], 'roles' => ['?']],
-                    ['allow' => true, 'actions' => ['logout'], 'roles' => ['@']],
+                    ['allow' => true, 'actions' => ['change-password', 'logout'], 'roles' => ['@']],
                 ],
             ],
         ];
@@ -89,6 +89,23 @@ class DefaultController extends Controller
 
         return $this->render('register', [
             'model'  => $model,
+        ]);
+    }
+
+    public function actionChangePassword()
+    {
+        /* @var $model \atans\user\models\ChangePasswordForm */
+        $model = Yii::createObject([
+            'class' => $this->getModule()->modelMap['ChangePasswordForm'],
+        ]);
+
+        if ($model->load(Yii::$app->request->post()) && $model->change()) {
+            Yii::$app->session->setFlash('success', Yii::t('user', 'Password has benn changed.'));
+            return $this->refresh();
+        }
+
+        return $this->render('change-password', [
+            'model' => $model,
         ]);
     }
 

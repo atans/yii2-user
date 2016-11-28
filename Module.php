@@ -92,10 +92,15 @@ class Module extends BaseModule
             'class' => 'yii\web\GroupUrlRule',
             'prefix' => 'user',
             'rules' => [
-                '<action:(login|register|logout)>'    => 'default/<action>',
+                '<action:(login|register|logout|change-password)>'    => 'default/<action>',
             ],
         ],
     ];
+
+    /**
+     * @var int
+     */
+    public $passwordResetTokenExpire = 3600;
 
     /**
      * @var array

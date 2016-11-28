@@ -2,6 +2,7 @@
 
 namespace atans\user\models;
 
+use atans\user\Module;
 use atans\user\traits\ModuleTrait;
 use atans\user\traits\StatusTrait;
 use Yii;
@@ -221,7 +222,7 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         $timestamp = (int)substr($token, strrpos($token, '_') + 1);
-        $expire    = Yii::$app->params['user.passwordResetTokenExpire'];
+        $expire    = Module::getInstance()->passwordResetTokenExpire;
 
         return $timestamp + $expire >= time();
     }
@@ -301,9 +302,38 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
+    /**
+     * Activate account
+     *
+     * @return bool
+     */
+    public function activate()
+    {
+        if (! $this->status == self::STATUS_PENDING) {
+            return false;
+        }
+
+        return (bool) $this->updateAttributes(['status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Block account
+     *
+     * @return bool
+     */
     public function block()
     {
         return (bool) $this->updateAttributes(['status' => self::STATUS_BLOCKED]);
+    }
+
+    /**
+     * Unblock account
+     *
+     * @return bool
+     */
+    public function unblock()
+    {
+        return (bool) $this->updateAttributes(['status' => self::STATUS_ACTIVE]);
     }
 
     public function getIsBlocked()
@@ -420,5 +450,4 @@ class User extends ActiveRecord implements IdentityInterface
 
         return parent::beforeSave($insert);
     }
-
 }

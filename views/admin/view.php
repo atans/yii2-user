@@ -7,18 +7,21 @@ use yii\widgets\DetailView;
 /* @var $model atans\user\models\User */
 
 $this->title = $model->username;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'Banks'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'User'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="bank-view">
+<div class="user-view">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <?= $this->render('_left', ['model' => $model]) ?>
+                </div>
+            </div>
+        </div>
 
-    <p>
-        <?= Html::a(Yii::t('user', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-    </p>
-
-    <div class="box">
-        <div class="box-body">
+        <div class="col-md-9">
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
@@ -36,5 +39,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ]) ?>
         </div>
     </div>
-
 </div>
+
+
