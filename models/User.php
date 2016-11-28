@@ -46,10 +46,10 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     const EVENT_BEFORE_CREATE = 'before_create';
-    const EVENT_AFTER_CREATE = 'before_create';
+    const EVENT_AFTER_CREATE  = 'before_create';
 
     const EVENT_BEFORE_REGISTER = 'before_register';
-    const EVENT_AFTER_REGISTER = 'after_register';
+    const EVENT_AFTER_REGISTER  = 'after_register';
 
     private $password;
 
@@ -86,29 +86,28 @@ class User extends ActiveRecord implements IdentityInterface
         $module = $this->getModule();
 
         return [
-            ['username', 'required'],
-            ['username', 'trim'],
-            ['username', 'filter', 'filter' => 'strtolower'],
-            ['username', 'match', 'pattern' => $module->usernamePattern],
-            ['username', 'unique'],
-            ['username', 'string', 'min' => $module->usernameMinLength, 'max' => $module->usernameMaxLength],
+            'usernameRequired' => ['username', 'required'],
+            'usernameTrim'     => ['username', 'trim'],
+            'usernamePattern'  => ['username', 'match', 'pattern' => $module->usernamePattern],
+            'usernameUnique'   => ['username', 'unique', 'message' => Yii::t('user', 'This username has already been taken')],
+            'usernameLength'   => ['username', 'string', 'min' => $module->usernameMinLength, 'max' => $module->usernameMaxLength],
 
-            ['email', 'required'],
-            ['email', 'trim'],
-            ['email', 'filter', 'filter'=>'strtolower'],
-            ['email', 'email'],
-            ['email', 'string', 'max' => $module->emailMaxLength],
-            ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used')],
+            'emailRequired'    => ['email', 'required'],
+            'emailTrim'        => ['email', 'trim'],
+            'emailFilter'      => ['email', 'filter', 'filter' => 'strtolower'],
+            'emailPattern'     => ['email', 'email'],
+            'emailLength'      => ['email', 'string', 'max' => $module->emailMaxLength],
+            'emailUnique'      => ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used')],
 
-            ['password', 'required', 'on' => [self::SCENARIO_REGISTER, self::SCENARIO_CREATE]],
-            ['password', 'string', 'min' => $module->passwordMinLength],
+            'passwordRequired' => ['password', 'required', 'on' => [self::SCENARIO_REGISTER, self::SCENARIO_CREATE]],
+            'passwordLength'   => ['password', 'string', 'min' => $module->passwordMinLength],
 
-            ['status', 'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            ['status', 'filter', 'filter' => 'strtolower'],
-            ['status', 'in', 'range' => self::getStatuses()],
+            'statusRequired'   => ['status', 'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            'statusFilter'     => ['status', 'filter', 'filter' => 'strtolower'],
+            'statusRange'      => ['status', 'in', 'range' => self::getStatuses()],
 
-            ['created_at', 'date', 'format' => 'php:Y-m-d H:i:s'],
-            ['updated_at', 'date', 'format' => 'php:Y-m-d H:i:s'],
+            'createdAtPattern' => ['created_at', 'date', 'format' => 'php:Y-m-d H:i:s'],
+            'updatedAtPattern' => ['updated_at', 'date', 'format' => 'php:Y-m-d H:i:s'],
         ];
     }
 
@@ -120,9 +119,8 @@ class User extends ActiveRecord implements IdentityInterface
         $scenarios = parent::scenarios();
 
         $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
-        $scenarios[self::SCENARIO_CREATE] = ['username', 'email', 'password', 'status'];
-        $scenarios[self::SCENARIO_UPDATE] = ['username', 'email', 'password', 'status'];
-
+        $scenarios[self::SCENARIO_CREATE]   = ['username', 'email', 'password', 'status'];
+        $scenarios[self::SCENARIO_UPDATE]   = ['username', 'email', 'password', 'status'];
 
         return $scenarios;
     }
@@ -133,12 +131,12 @@ class User extends ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'username'   => Yii::t('user', 'Username'),
-            'email'      => Yii::t('user', 'Email'),
-            'registration_ip'      => Yii::t('user', 'Registration IP'),
-            'status'     => Yii::t('user', 'Status'),
-            'created_at' => Yii::t('user', 'Created At'),
-            'Updated_at' => Yii::t('user', 'Updated At'),
+            'username'        => Yii::t('user', 'Username'),
+            'email'           => Yii::t('user', 'Email'),
+            'registration_ip' => Yii::t('user', 'Registration IP'),
+            'status'          => Yii::t('user', 'Status'),
+            'created_at'      => Yii::t('user', 'Created At'),
+            'Updated_at'      => Yii::t('user', 'Updated At'),
         ];
     }
 
@@ -149,7 +147,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             self::STATUS_PENDING => Yii::t('user', 'Pending'),
-            self::STATUS_ACTIVE => Yii::t('user', 'Active'),
+            self::STATUS_ACTIVE  => Yii::t('user', 'Active'),
             self::STATUS_BLOCKED => Yii::t('user', 'Blocked'),
         ];
     }
@@ -271,7 +269,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function setPassword($password)
     {
-        $this->password = $password;
+        $this->password      = $password;
         $this->password_hash = Yii::$app->security->generatePasswordHash($password, $this->getModule()->passwordCost);
     }
 
@@ -315,7 +313,7 @@ class User extends ActiveRecord implements IdentityInterface
             return false;
         }
 
-        return (bool) $this->updateAttributes(['status' => self::STATUS_ACTIVE]);
+        return (bool)$this->updateAttributes(['status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -325,7 +323,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function block()
     {
-        return (bool) $this->updateAttributes(['status' => self::STATUS_BLOCKED]);
+        return (bool)$this->updateAttributes(['status' => self::STATUS_BLOCKED]);
     }
 
     /**
@@ -335,7 +333,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function unblock()
     {
-        return (bool) $this->updateAttributes(['status' => self::STATUS_ACTIVE]);
+        return (bool)$this->updateAttributes(['status' => self::STATUS_ACTIVE]);
     }
 
     public function getIsBlocked()
@@ -366,6 +364,8 @@ class User extends ActiveRecord implements IdentityInterface
      * @return bool
      * @throws NotAcceptableHttpException
      * @throws \yii\db\Exception
+     * @throws Exception
+     * @throws ErrorException
      */
     public function create()
     {
@@ -391,7 +391,6 @@ class User extends ActiveRecord implements IdentityInterface
             $this->trigger(self::EVENT_AFTER_CREATE);
 
             return true;
-
         } catch (\Exception $e) {
             $transaction->rollBack();
             throw new ErrorException($e->getMessage());
@@ -404,6 +403,8 @@ class User extends ActiveRecord implements IdentityInterface
      * @return bool
      * @throws NotAcceptableHttpException
      * @throws \yii\db\Exception
+     * @throws Exception
+     * @throws ErrorException
      */
     public function register()
     {
@@ -431,7 +432,6 @@ class User extends ActiveRecord implements IdentityInterface
             $this->trigger(self::EVENT_AFTER_REGISTER);
 
             return true;
-
         } catch (\Exception $e) {
             $transaction->rollBack();
             throw new ErrorException($e->getMessage());
