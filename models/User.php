@@ -6,6 +6,8 @@ use atans\user\Module;
 use atans\user\traits\ModuleTrait;
 use atans\user\traits\StatusTrait;
 use Yii;
+use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
@@ -381,7 +383,7 @@ class User extends ActiveRecord implements IdentityInterface
             $this->trigger(self::EVENT_BEFORE_CREATE);
 
             if (! $this->save()) {
-                $transaction->rollBack();
+                throw new Exception('User can not create');
             }
 
             $transaction->commit();
@@ -392,7 +394,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         } catch (\Exception $e) {
             $transaction->rollBack();
-            return true;
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -421,7 +423,7 @@ class User extends ActiveRecord implements IdentityInterface
             $this->trigger(self::EVENT_BEFORE_REGISTER);
 
             if (! $this->save()) {
-                $transaction->rollBack();
+                throw new Exception('User can not register');
             }
 
             $transaction->commit();
@@ -432,7 +434,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         } catch (\Exception $e) {
             $transaction->rollBack();
-            return true;
+            throw new ErrorException($e->getMessage());
         }
     }
 
