@@ -22,24 +22,24 @@ class RegistrationForm extends Model
         $module = $this->getModule();
 
         return [
-            ['username', 'required'],
-            ['username', 'trim'],
-            ['username', 'filter', 'filter' => 'strtolower'],
-            ['username', 'unique', 'targetClass' => $module->modelMap['User'], 'message' => Yii::t('user', 'This username has already been taken.')],
-            ['username', 'string', 'min' => $module->usernameMinLength, 'max' => $module->usernameMaxLength],
-            ['username', 'match', 'pattern' => $module->usernamePattern],
+            'usernameRequired' => ['username', 'required'],
+            'usernameTrim'     => ['username', 'trim'],
+            'usernamePattern'  => ['username', 'match', 'pattern' => $module->usernamePattern],
+            'usernameUnique'   => ['username', 'unique', 'message' => Yii::t('user', 'This username has already been taken')],
+            'usernameLength'   => ['username', 'string', 'min' => $module->usernameMinLength, 'max' => $module->usernameMaxLength],
 
-            ['email', 'required'],
-            ['email', 'trim'],
-            ['email', 'filter', 'filter'=>'strtolower'],
-            ['email', 'email'],
-            ['email', 'string', 'max' => $module->emailMaxLength],
-            ['email', 'unique', 'targetClass' => $module->modelMap['User'], 'message' => Yii::t('user', 'This email address has already been taken.')],
+            'emailRequired'    => ['email', 'required'],
+            'emailTrim'        => ['email', 'trim'],
+            'emailFilter'      => ['email', 'filter', 'filter' => 'strtolower'],
+            'emailPattern'     => ['email', 'email'],
+            'emailLength'      => ['email', 'string', 'max' => $module->emailMaxLength],
+            'emailUnique'      => ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used')],
 
-            ['password', 'required'],
-            ['password', 'string', 'min' => $module->passwordMinLength],
+            'passwordRequired' => ['password', 'required'],
+            'passwordLength' => ['password', 'string', 'min' => $module->passwordMinLength],
 
-            ['passwordRepeat', 'compare', 'compareAttribute' => 'password'],
+            'passwordRepeatRequired' => ['password', 'required'],
+            'passwordRepeatCompare' => ['passwordRepeat', 'compare', 'compareAttribute' => 'password'],
         ];
     }
 
@@ -59,7 +59,7 @@ class RegistrationForm extends Model
     /**
      * Signs user up.
      *
-     * @return User|null the saved model or null if saving fails
+     * @return boolean|null the saved model or null if saving fails
      */
     public function register()
     {
