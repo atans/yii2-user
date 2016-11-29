@@ -10,7 +10,7 @@ class LoginForm extends Model
 {
     use ModuleTrait;
 
-    public $identity;
+    public $username;
     public $password;
     public $rememberMe;
 
@@ -44,7 +44,7 @@ class LoginForm extends Model
     public function rules()
     {
         return [
-            ['identity', 'required'],
+            ['username', 'required'],
 
             ['password', 'required'],
             ['password', 'validatePassword'],
@@ -56,9 +56,9 @@ class LoginForm extends Model
     public function attributeLabels()
     {
         return [
-            'identity'   => Yii::t('user', 'Username'),
+            'username'   => Yii::t('user', 'Username'),
             'password'   => Yii::t('user', 'Password'),
-            'rememberMe' => Yii::t('user', 'Remember me'),
+            'rememberMe' => Yii::t('user', 'Remember Me'),
         ];
     }
 
@@ -101,7 +101,7 @@ class LoginForm extends Model
     protected function getUser()
     {
         if ($this->user === null) {
-            $this->user = $this->finder->findUserByUsernameOrEmail($this->identity);
+            $this->user = $this->finder->findUserByUsernameOrEmail($this->username);
         }
 
         return $this->user;
