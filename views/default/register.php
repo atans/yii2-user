@@ -3,8 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
-/* @var $this \yii\web\view */
-/* @var $model \atans\user\models\RegistrationForm */
+/* @var $this yii\web\view */
+/* @var $model atans\user\models\RegistrationForm */
 
 $this->title = Yii::t('user', 'Register');
 $this->params['breadcrumbs'][] = $this->title;
