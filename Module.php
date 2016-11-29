@@ -4,7 +4,6 @@ namespace atans\user;
 
 use Yii;
 use yii\base\Module as BaseModule;
-use yii\filters\AccessControl;
 
 class Module extends BaseModule
 {
