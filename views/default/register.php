@@ -10,7 +10,7 @@ $this->title = Yii::t('user', 'Register');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="user-login">
+<div class="user-register">
     <h3><?= Html::encode($this->title) ?></h3>
 
     <div class="row">

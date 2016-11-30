@@ -25,7 +25,7 @@ class RegistrationForm extends Model
             'usernameRequired' => ['username', 'required'],
             'usernameTrim'     => ['username', 'trim'],
             'usernamePattern'  => ['username', 'match', 'pattern' => $module->usernamePattern],
-            'usernameUnique'   => ['username', 'unique', 'message' => Yii::t('user', 'This username has already been taken')],
+            'usernameUnique'   => ['username', 'unique', 'targetClass' => $module->modelMap['User'], 'message' => Yii::t('user', 'This username has already been taken')],
             'usernameLength'   => ['username', 'string', 'min' => $module->usernameMinLength, 'max' => $module->usernameMaxLength],
 
             'emailRequired'    => ['email', 'required'],
@@ -33,7 +33,7 @@ class RegistrationForm extends Model
             'emailFilter'      => ['email', 'filter', 'filter' => 'strtolower'],
             'emailPattern'     => ['email', 'email'],
             'emailLength'      => ['email', 'string', 'max' => $module->emailMaxLength],
-            'emailUnique'      => ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used')],
+            'emailUnique'      => ['email', 'unique',  'targetClass' => $module->modelMap['User'],'message' => Yii::t('user', 'The email has been already used')],
 
             'passwordRequired' => ['password', 'required'],
             'passwordLength' => ['password', 'string', 'min' => $module->passwordMinLength],
