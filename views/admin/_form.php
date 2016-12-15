@@ -9,25 +9,27 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="refund-form">
+<div class="user-form">
+    <div class="box">
+        <div class="box-body">
+            <?php $form = ActiveForm::begin([
+                'enableAjaxValidation' => true,
+                'enableClientValidation' => false,
+            ]); ?>
 
-    <?php $form = ActiveForm::begin([
-        'enableAjaxValidation' => true,
-        'enableClientValidation' => false,
-    ]); ?>
+            <?= $form->field($model, 'username')->textInput() ?>
 
-    <?= $form->field($model, 'username')->textInput() ?>
+            <?= $form->field($model, 'email')->textInput() ?>
 
-    <?= $form->field($model, 'email')->textInput() ?>
+            <?= $form->field($model, 'password')->textInput() ?>
 
-    <?= $form->field($model, 'password')->textInput() ?>
+            <?= $form->field($model, 'status')->radioList(User::getStatusValueOptions()) ?>
 
-    <?= $form->field($model, 'status')->radioList(User::getStatusValueOptions()) ?>
+            <div class="form-group">
+                <?= Html::submitButton(Yii::t('user', 'Submit'), ['class' => 'btn btn-primary']) ?>
+            </div>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('user', 'Submit'), ['class' => 'btn btn-primary']) ?>
+            <?php ActiveForm::end(); ?>
+        </div>
     </div>
-
-    <?php ActiveForm::end(); ?>
-
 </div>

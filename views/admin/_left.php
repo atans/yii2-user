@@ -1,10 +1,9 @@
 <?php
 use yii\bootstrap\Nav;
 
+/* @var $this yii\web\View */
 /* @var $model atans\user\models\User */
 ?>
-
-
 
 <?= Nav::widget([
     'options' => [
@@ -12,7 +11,7 @@ use yii\bootstrap\Nav;
     ],
     'items' => [
         [
-            'label' => Yii::t('user', 'Account details'),
+            'label' => Yii::t('user', 'Account Details'),
             'url' => ['/user/admin/update', 'id' => $model->id]
         ],
         ['label' => Yii::t('user', 'Information'), 'url' => ['/user/admin/view', 'id' => $model->id]],

@@ -23,7 +23,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="col-md-9">
-            <?= Assignments::widget(['user_id' => $model->id]) ?>
+            <div class="box">
+                <div class="box-body">
+                    <?= Assignments::widget(['user_id' => $model->id]) ?>
+                </div>
+            </div>
         </div>
     </div>
 </div>

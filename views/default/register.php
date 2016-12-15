@@ -15,24 +15,28 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="row">
         <div class="col-lg-5">
-        <?php $form = ActiveForm::begin([
-            'id'                     => 'registration-form',
-            'enableAjaxValidation'   => true,
-            'enableClientValidation' => false,
-        ]); ?>
+            <div class="box">
+                <div class="box-body">
+                    <?php $form = ActiveForm::begin([
+                            'id'                     => 'registration-form',
+                            'enableAjaxValidation'   => true,
+                            'enableClientValidation' => false,
+                        ]); ?>
 
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+                        <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
 
-            <?= $form->field($model, 'email')->textInput() ?>
+                        <?= $form->field($model, 'email')->textInput() ?>
 
-            <?= $form->field($model, 'password')->passwordInput() ?>
+                        <?= $form->field($model, 'password')->passwordInput() ?>
 
-            <?= $form->field($model, 'passwordRepeat')->passwordInput() ?>
+                        <?= $form->field($model, 'passwordRepeat')->passwordInput() ?>
 
 
-            <?= Html::submitButton(Yii::t('user', 'Register'), ['class' => 'btn btn-success']) ?>
+                        <?= Html::submitButton(Yii::t('user', 'Register'), ['class' => 'btn btn-success']) ?>
 
-        <?php ActiveForm::end(); ?>
+                    <?php ActiveForm::end(); ?>
+                </div>
+            </div>
         </div>
     </div>
 </div>
