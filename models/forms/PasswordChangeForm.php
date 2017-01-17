@@ -1,15 +1,15 @@
 <?php
 
-namespace atans\user\models;
+namespace atans\user\models\forms;
 
-use atans\user\models\User;
 use Yii;
-use atans\user\traits\ModuleTrait;
+use atans\user\models\User;
+use atans\user\traits\UserModuleTrait;
 use yii\base\Model;
 
-class ChangePasswordForm extends Model
+class PasswordChangeForm extends Model
 {
-    use ModuleTrait;
+    use UserModuleTrait;
 
     public $password;
     public $newPassword;
@@ -18,7 +18,7 @@ class ChangePasswordForm extends Model
     /**
      * @var User
      */
-    private $user;
+    protected $user;
 
     /**
      * @inheritdoc
@@ -26,20 +26,20 @@ class ChangePasswordForm extends Model
     public function rules()
     {
         return [
-            ['password', 'required'],
-            ['password', 'trim'],
-            ['password', function($attribute){
+            'passwordRequired' => ['password', 'required'],
+            'passwordTrim' => ['password', 'trim'],
+            'passwordValidate' => ['password', function($attribute){
                 if (! $this->getUser()->validatePassword($this->password)) {
                     $this->addError($attribute, Yii::t('user', 'Incorrect current password.'));
                 }
             }],
 
-            ['newPassword', 'required'],
-            ['newPassword', 'trim'],
-            ['newPassword', 'string', 'min' => $this->getModule()->passwordMinLength],
+            'newPasswordRequired' => ['newPassword', 'required'],
+            'newPasswordTrim' => ['newPassword', 'trim'],
+            'newPasswordString' => ['newPassword', 'string', 'min' => self::getUserModule()->passwordMinLength],
 
-            ['newPasswordRepeat', 'required'],
-            ['newPasswordRepeat', 'compare', 'compareAttribute' => 'newPassword'],
+            'newPasswordRepeatRequired' => ['newPasswordRepeat', 'required'],
+            'newPasswordRepeatCompare' => ['newPasswordRepeat', 'compare', 'compareAttribute' => 'newPassword'],
         ];
     }
 
@@ -67,9 +67,9 @@ class ChangePasswordForm extends Model
         }
 
         $user = $this->getUser();
-        $user->setPassword($this->newPassword);
+        $success = $user->changePassword($this->newPassword);
 
-        return $user->save();
+        return $success;
     }
 
     /**

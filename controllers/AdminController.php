@@ -3,10 +3,11 @@
 namespace atans\user\controllers;
 
 use atans\user\models\User;
+use atans\user\Module;
 use atans\user\traits\AjaxValidationTrait;
 use Yii;
 use atans\user\Finder;
-use atans\user\traits\ModuleTrait;
+use atans\user\traits\UserModuleTrait;
 use yii\filters\AccessControl;
 use yii\filters\AccessRule;
 use yii\filters\VerbFilter;
@@ -17,7 +18,7 @@ use yii\web\NotFoundHttpException;
 class AdminController extends Controller
 {
     use AjaxValidationTrait;
-    use ModuleTrait;
+    use UserModuleTrait;
 
     const URL_REMEMBER = 'user-admin';
 
@@ -47,7 +48,7 @@ class AdminController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => self::getUserModule()->adminRoles,
                     ],
                 ],
             ],
@@ -70,7 +71,7 @@ class AdminController extends Controller
     {
         Url::remember('', self::URL_REMEMBER);
 
-        $searchModel = Yii::createObject($this->getModule()->modelMap['UserSearch']);
+        $searchModel = Yii::createObject(self::getUserModule()->modelMap['UserSearch']);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -83,7 +84,7 @@ class AdminController extends Controller
     {
         /* @var $model User*/
         $model = Yii::createObject([
-            'class' => $this->getModule()->modelMap["User"],
+            'class' => self::getUserModule()->modelMap['User'],
             'scenario' => User::SCENARIO_CREATE,
         ]);
 

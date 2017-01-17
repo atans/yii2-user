@@ -1,14 +1,15 @@
 <?php
-namespace atans\user\models;
+namespace atans\user\models\forms;
 
+use atans\user\models\User;
 use atans\user\Finder;
-use atans\user\traits\ModuleTrait;
+use atans\user\traits\UserModuleTrait;
 use Yii;
 use yii\base\Model;
 
 class LoginForm extends Model
 {
-    use ModuleTrait;
+    use UserModuleTrait;
 
     public $username;
     public $password;
@@ -17,12 +18,12 @@ class LoginForm extends Model
     /**
      * @var \atans\user\models\User
      */
-    private $user;
+    protected $user;
 
     /**
      * @var \atans\user\Finder
      */
-    private $finder;
+    protected $finder;
 
     /**
      * Constructor
@@ -33,7 +34,7 @@ class LoginForm extends Model
     public function __construct(Finder $finder, $config = [])
     {
         $this->finder     = $finder;
-        $this->rememberMe = $this->getModule()->defaultRememberMe;
+        $this->rememberMe = self::getUserModule()->defaultRememberMe;
 
         parent::__construct($config);
     }
@@ -44,15 +45,18 @@ class LoginForm extends Model
     public function rules()
     {
         return [
-            ['username', 'required'],
+            'usernameRequired' => ['username', 'required'],
 
-            ['password', 'required'],
-            ['password', 'validatePassword'],
+            'passwordRequired' => ['password', 'required'],
+            'passwordValidate' => ['password', 'validatePassword'],
 
-            ['rememberMe', 'boolean'],
+            'rememberMePattern' => ['rememberMe', 'boolean'],
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels()
     {
         return [
@@ -87,10 +91,10 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? $this->getModule()->rememberMeDuration : 0);
-        } else {
-            return false;
+            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? self::getUserModule()->rememberMeDuration : 0);
         }
+
+        return false;
     }
 
     /**

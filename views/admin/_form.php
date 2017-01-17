@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
 
             <?= $form->field($model, 'password')->textInput() ?>
 
-            <?= $form->field($model, 'status')->radioList(User::getStatusValueOptions()) ?>
+            <?= $form->field($model, 'status')->radioList(User::getStatusItems()) ?>
 
             <div class="form-group">
                 <?= Html::submitButton(Yii::t('user', 'Submit'), ['class' => 'btn btn-primary']) ?>

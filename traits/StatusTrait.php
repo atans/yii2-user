@@ -34,7 +34,7 @@ trait StatusTrait
     {
         $status = $status ? $status : $this->status;
 
-        $statusValueOptions = self::getStatusValueOptions();
+        $statusValueOptions = self::getStatusItems();
         if (isset($statusValueOptions[$status])) {
             return $statusValueOptions[$status];
         }
@@ -49,7 +49,7 @@ trait StatusTrait
      */
     public static function getStatuses()
     {
-        return array_keys(self::getStatusValueOptions());
+        return array_keys(self::getStatusItems());
     }
 
     /**
@@ -57,7 +57,7 @@ trait StatusTrait
      *
      * @return array
      */
-    public static function getStatusValueOptions()
+    public static function getStatusItems()
     {
         return [];
     }

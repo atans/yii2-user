@@ -17,6 +17,11 @@ class m161117_092637_init extends \atans\user\migrations\Migration
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime()->notNull(),
         ], $this->tableOptions);
+
+        $this->createIndex('{{%user_username}}', '{{%user}}', 'username', true);
+        $this->createIndex('{{%user_auth_key}}', '{{%user}}', 'auth_key');
+        $this->createIndex('{{%user_email}}', '{{%user}}', 'email', true);
+        $this->createIndex('{{%user_status}}', '{{%user}}', 'status');
     }
 
     public function down()

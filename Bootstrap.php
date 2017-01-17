@@ -9,12 +9,20 @@ use yii\i18n\PhpMessageSource;
 
 class Bootstrap implements BootstrapInterface
 {
+    /**
+     * @var array model map
+     */
     private $modelMap = [
         'User'               => 'atans\user\models\User',
-        'LoginForm'          => 'atans\user\models\LoginForm',
-        'RegistrationForm'   => 'atans\user\models\RegistrationForm',
-        'ChangePasswordForm' => 'atans\user\models\ChangePasswordForm',
-        'UserSearch'         => 'atans\user\models\UserSearch',
+        'UserToken'          => 'atans\user\models\UserToken',
+        'LoginForm'          => 'atans\user\models\forms\LoginForm',
+        'RegistrationForm'   => 'atans\user\models\forms\RegistrationForm',
+        'ResendForm'         => 'atans\user\models\forms\ResendForm',
+        'EmailChangeForm'    => 'atans\user\models\forms\EmailChangeForm',
+        'PasswordChangeForm' => 'atans\user\models\forms\PasswordChangeForm',
+        'PasswordForgotForm' => 'atans\user\models\forms\PasswordForgotForm',
+        'PasswordResetForm'  => 'atans\user\models\forms\PasswordResetForm',
+        'UserSearch'         => 'atans\user\models\search\UserSearch',
     ];
 
     /**
@@ -47,6 +55,7 @@ class Bootstrap implements BootstrapInterface
         }
 
         if ($app instanceof ConsoleApplication) {
+            // TODO
         } else {
             if (! isset($app->i18n->translations['user*'])) {
                 $app->i18n->translations['user*'] = [
@@ -61,12 +70,7 @@ class Bootstrap implements BootstrapInterface
                 'identityClass'   => $module->modelMap['User'],
             ]);
 
-            $urlRules = [];
-            foreach ($module->urlRules as $urlRule) {
-                $urlRules[] = Yii::createObject($urlRule);
-            }
-
-            $app->urlManager->addRules($urlRules, false);
+            Yii::$container->set(Mailer::className(), $module->mailer);
         }
     }
 }

@@ -2,11 +2,10 @@
 
 namespace atans\user\models;
 
-use atans\user\Module;
-use atans\user\traits\ModuleTrait;
+use atans\user\Mailer;
+use atans\user\traits\UserModuleTrait;
 use atans\user\traits\StatusTrait;
 use Yii;
-use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\AttributeBehavior;
@@ -29,20 +28,26 @@ use yii\web\NotAcceptableHttpException;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ *
+ * @property-read Mailer $mailer
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    use ModuleTrait;
+    use UserModuleTrait;
     use StatusTrait;
 
-    const SCENARIO_REGISTER = 'register';
-    const SCENARIO_CREATE   = 'create';
-    const SCENARIO_UPDATE   = 'update';
+    const SCENARIO_REGISTER        = 'register';
+    const SCENARIO_CREATE          = 'create';
+    const SCENARIO_UPDATE          = 'update';
+    const SCENARIO_CHANGE_EMAIL    = 'change_email';
 
-    const STATUS_ACTIVE  = 'active';
-    const STATUS_DELETED = 'deleted';
-    const STATUS_PENDING = 'pending';
-    const STATUS_BLOCKED = 'blocked';
+    const STATUS_UNCONFIRMED       = 'unconfirmed';
+    const STATUS_INACTIVE          = 'inactive';
+    const STATUS_ACTIVE            = 'active';
+    const STATUS_DELETED           = 'deleted';
+    const STATUS_UNCONFIRMED_EMAIL = 'unconfirmed_email';
+    const STATUS_PENDING           = 'pending';
+    const STATUS_BLOCKED           = 'blocked';
 
     const EVENT_BEFORE_CREATE = 'before_create';
     const EVENT_AFTER_CREATE  = 'before_create';
@@ -82,7 +87,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function rules()
     {
-        $module = $this->getModule();
+        $module = static::getUserModule();
 
         return [
             'usernameRequired' => ['username', 'required'],
@@ -98,12 +103,12 @@ class User extends ActiveRecord implements IdentityInterface
             'emailLength'      => ['email', 'string', 'max' => $module->emailMaxLength],
             'emailUnique'      => ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used')],
 
-            'passwordRequired' => ['password', 'required', 'on' => [self::SCENARIO_REGISTER, self::SCENARIO_CREATE]],
+            'passwordRequired' => ['password', 'required', 'on' => [static::SCENARIO_REGISTER, static::SCENARIO_CREATE]],
             'passwordLength'   => ['password', 'string', 'min' => $module->passwordMinLength],
 
-            'statusRequired'   => ['status', 'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            'statusRequired'   => ['status', 'required', 'on' => [static::SCENARIO_CREATE, static::SCENARIO_UPDATE]],
             'statusFilter'     => ['status', 'filter', 'filter' => 'strtolower'],
-            'statusRange'      => ['status', 'in', 'range' => self::getStatuses()],
+            'statusRange'      => ['status', 'in', 'range' => static::getStatuses()],
 
             'createdAtPattern' => ['created_at', 'date', 'format' => 'php:Y-m-d H:i:s'],
             'updatedAtPattern' => ['updated_at', 'date', 'format' => 'php:Y-m-d H:i:s'],
@@ -117,9 +122,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $scenarios = parent::scenarios();
 
-        $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
-        $scenarios[self::SCENARIO_CREATE]   = ['username', 'email', 'password', 'status'];
-        $scenarios[self::SCENARIO_UPDATE]   = ['username', 'email', 'password', 'status'];
+        $scenarios[static::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        $scenarios[static::SCENARIO_CREATE]   = ['username', 'email', 'password', 'status'];
+        $scenarios[static::SCENARIO_UPDATE]   = ['username', 'email', 'password', 'status'];
+        $scenarios[static::SCENARIO_CHANGE_EMAIL]   = ['email'];
 
         return $scenarios;
     }
@@ -142,12 +148,12 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public static function getStatusValueOptions()
+    public static function getStatusItems()
     {
         return [
-            self::STATUS_PENDING => Yii::t('user', 'Pending'),
-            self::STATUS_ACTIVE  => Yii::t('user', 'Active'),
-            self::STATUS_BLOCKED => Yii::t('user', 'Blocked'),
+            static::STATUS_PENDING => Yii::t('user', 'Pending'),
+            static::STATUS_ACTIVE  => Yii::t('user', 'Active'),
+            static::STATUS_BLOCKED => Yii::t('user', 'Blocked'),
         ];
     }
 
@@ -204,26 +210,8 @@ class User extends ActiveRecord implements IdentityInterface
 
         return static::findOne([
             'password_reset_token' => $token,
-            'status'               => self::STATUS_ACTIVE,
+            'status'               => static::STATUS_ACTIVE,
         ]);
-    }
-
-    /**
-     * Finds out if password reset token is valid
-     *
-     * @param string $token password reset token
-     * @return boolean
-     */
-    public static function isPasswordResetTokenValid($token)
-    {
-        if (empty($token)) {
-            return false;
-        }
-
-        $timestamp = (int)substr($token, strrpos($token, '_') + 1);
-        $expire    = Module::getInstance()->passwordResetTokenExpire;
-
-        return $timestamp + $expire >= time();
     }
 
     /**
@@ -269,7 +257,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function setPassword($password)
     {
         $this->password      = $password;
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password, $this->getModule()->passwordCost);
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password, static::getUserModule()->passwordCost);
     }
 
     public function getPassword()
@@ -308,11 +296,11 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function activate()
     {
-        if (! $this->status == self::STATUS_PENDING) {
+        if (! $this->status == static::STATUS_PENDING) {
             return false;
         }
 
-        return (bool)$this->updateAttributes(['status' => self::STATUS_ACTIVE]);
+        return (bool)$this->updateAttributes(['status' => static::STATUS_ACTIVE]);
     }
 
     /**
@@ -322,7 +310,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function block()
     {
-        return (bool)$this->updateAttributes(['status' => self::STATUS_BLOCKED]);
+        return (bool)$this->updateAttributes(['status' => static::STATUS_BLOCKED]);
     }
 
     /**
@@ -332,12 +320,12 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function unblock()
     {
-        return (bool)$this->updateAttributes(['status' => self::STATUS_ACTIVE]);
+        return (bool)$this->updateAttributes(['status' => static::STATUS_ACTIVE]);
     }
 
     public function getIsBlocked()
     {
-        return $this->status == self::STATUS_BLOCKED;
+        return $this->status == static::STATUS_BLOCKED;
     }
 
     /**
@@ -348,13 +336,13 @@ class User extends ActiveRecord implements IdentityInterface
     public function getIsAdmin()
     {
         if (Yii::$app->getAuthManager()
-            && $this->getModule()->adminPermission
-            && Yii::$app->user->can($this->getModule()->adminPermission)
+            && static::getUserModule()->adminPermission
+            && Yii::$app->user->can(static::getUserModule()->adminPermission)
         ) {
             return true;
         }
 
-        return in_array($this->username, $this->getModule()->admins);
+        return in_array($this->username, static::getUserModule()->admins);
     }
 
     /**
@@ -363,8 +351,7 @@ class User extends ActiveRecord implements IdentityInterface
      * @return bool
      * @throws NotAcceptableHttpException
      * @throws \yii\db\Exception
-     * @throws Exception
-     * @throws ErrorException
+     * @throws \Exception
      */
     public function create()
     {
@@ -379,7 +366,7 @@ class User extends ActiveRecord implements IdentityInterface
                 $this->password = Yii::$app->security->generateRandomString(8);
             }
 
-            $this->trigger(self::EVENT_BEFORE_CREATE);
+            $this->trigger(static::EVENT_BEFORE_CREATE);
 
             if (! $this->save()) {
                 throw new Exception('User can not create');
@@ -387,13 +374,16 @@ class User extends ActiveRecord implements IdentityInterface
 
             $transaction->commit();
 
-            $this->trigger(self::EVENT_AFTER_CREATE);
+            $this->trigger(static::EVENT_AFTER_CREATE);
 
-            return true;
         } catch (\Exception $e) {
             $transaction->rollBack();
-            throw new ErrorException($e->getMessage());
+
+            Yii::warning($e->getMessage());
+            throw $e;
         }
+
+        return true;
     }
 
     /**
@@ -402,8 +392,7 @@ class User extends ActiveRecord implements IdentityInterface
      * @return bool
      * @throws NotAcceptableHttpException
      * @throws \yii\db\Exception
-     * @throws Exception
-     * @throws ErrorException
+     * @throws \Exception
      */
     public function register()
     {
@@ -412,29 +401,162 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         $transaction = $this->getDb()->beginTransaction();
+        $module = static::getUserModule();
 
         try {
-            $this->status = $this->getModule()->defaultStatus;
+            $this->status = $module->defaultStatus;
 
-            if ($this->getModule()->enableGeneratingPassword && is_null($this->password)) {
+            $userToken = null;
+            if ($module->enableConfirmation) {
+                $this->status = $module->unconfirmedStatus;
+            }
+
+            if (static::getUserModule()->enableGeneratingPassword && is_null($this->password)) {
                 $this->setPassword(Yii::$app->security->generateRandomString(8));
             }
 
-            $this->trigger(self::EVENT_BEFORE_REGISTER);
+            $this->trigger(static::EVENT_BEFORE_REGISTER);
 
             if (! $this->save()) {
                 throw new Exception('User can not register');
             }
 
+            if ($module->enableConfirmation) {
+                /* @var $userTokenModel \atans\user\models\UserToken */
+                $userTokenModel = Yii::createObject([
+                    'class' => $module->modelMap['UserToken'],
+                ]);
+
+                $expired_at = date('Y-m-d H:i:s', strtotime($module->confirmationExpireTime));
+
+                $userToken = $userTokenModel::generate($this->id, $userTokenModel::TYPE_CONFIRMATION, null, $expired_at);
+            }
+
+            // Send welcome message
+            $this->mailer->sendWelcomeMessage($this, $userToken);
+
+            $this->trigger(static::EVENT_AFTER_REGISTER);
+
             $transaction->commit();
 
-            $this->trigger(self::EVENT_AFTER_REGISTER);
-
-            return true;
         } catch (\Exception $e) {
             $transaction->rollBack();
-            throw new ErrorException($e->getMessage());
+            Yii::warning($e->getMessage());
+            throw $e;
         }
+
+        return true;
+    }
+
+    /**
+     * Confirm account
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function confirm()
+    {
+        $transaction = Yii::$app->getDb()->beginTransaction();
+        $userModule = static::getUserModule();
+
+        try {
+            // Incorrect unconfirmed status
+            if ($this->status !== $userModule->unconfirmedStatus) {
+                return false;
+            }
+
+            // Account is confirmed
+            if ($this->status == $userModule->confirmedStatus) {
+                return true;
+            }
+
+            $this->status = static::getUserModule()->confirmedStatus;
+
+            if (! $this->save(false, ['status'])) {
+                throw new Exception('User can not confirm');
+            }
+
+            $transaction->commit();
+
+            return true;
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+
+            Yii::warning($e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function changeEmail($email)
+    {
+        $transaction = $this->getDb()->beginTransaction();
+
+        try {
+            $this->email = $email;
+
+            if (! $this->save()) {
+                throw new Exception('User can not change email');
+            }
+
+            $transaction->commit();
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::warning($e->getMessage());
+            throw $e;
+        }
+
+        return true;
+    }
+
+    public function isEmailChanged($newEmail)
+    {
+        return $this->email !== $newEmail;
+    }
+
+    /**
+     * Change password
+     *
+     * @param $password
+     * @return bool
+     * @throws \Exception
+     */
+    public function changePassword($password)
+    {
+        $transaction = $this->getDb()->beginTransaction();
+
+        try {
+            $this->setPassword($password);
+            $this->generateAuthKey();
+
+            if (! $this->save(false, ['password_hash', 'auth_key'])) {
+                throw new Exception('User can not change password');
+            }
+
+            $transaction->commit();
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::warning($e->getMessage());
+            throw $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * send new password to user
+     *
+     * @return bool
+     */
+    public function resendPassword()
+    {
+        $password = Yii::$app->security->generateRandomString(8);
+        $this->setPassword($password);
+        $this->save(false, ['password_hash']);
+
+        return $this->getMailer()->sendGeneratedPassword($this, $password);
     }
 
     /**
@@ -450,5 +572,15 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * Get mailer
+     *
+     * @return Mailer|object
+     */
+    protected function getMailer()
+    {
+        return Yii::$container->get(Mailer::className());
     }
 }

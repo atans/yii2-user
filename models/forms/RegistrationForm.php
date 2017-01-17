@@ -1,13 +1,14 @@
 <?php
-namespace atans\user\models;
+namespace atans\user\models\forms;
 
-use atans\user\traits\ModuleTrait;
+use atans\user\traits\UserModuleTrait;
+use atans\user\models\User;
 use Yii;
 use yii\base\Model;
 
 class RegistrationForm extends Model
 {
-    use ModuleTrait;
+    use UserModuleTrait;
 
     public $username;
     public $email;
@@ -19,7 +20,7 @@ class RegistrationForm extends Model
      */
     public function rules()
     {
-        $module = $this->getModule();
+        $module = self::getUserModule();
 
         return [
             'usernameRequired' => ['username', 'required'],
@@ -36,10 +37,10 @@ class RegistrationForm extends Model
             'emailUnique'      => ['email', 'unique',  'targetClass' => $module->modelMap['User'],'message' => Yii::t('user', 'The email has been already used')],
 
             'passwordRequired' => ['password', 'required'],
-            'passwordLength' => ['password', 'string', 'min' => $module->passwordMinLength],
+            'passwordLength'   => ['password', 'string', 'min' => $module->passwordMinLength],
 
             'passwordRepeatRequired' => ['password', 'required'],
-            'passwordRepeatCompare' => ['passwordRepeat', 'compare', 'compareAttribute' => 'password'],
+            'passwordRepeatCompare'  => ['passwordRepeat', 'compare', 'compareAttribute' => 'password'],
         ];
     }
 
@@ -59,7 +60,7 @@ class RegistrationForm extends Model
     /**
      * Signs user up.
      *
-     * @return boolean|null the saved model or null if saving fails
+     * @return boolean|null
      */
     public function register()
     {
@@ -69,7 +70,7 @@ class RegistrationForm extends Model
 
         /* @var $user User */
         $user = Yii::createObject([
-            'class' => $this->getModule()->modelMap['User'],
+            'class' => self::getUserModule()->modelMap['User'],
             'scenario' => User::SCENARIO_REGISTER,
         ]);
         $user->setAttributes($this->getAttributes());
