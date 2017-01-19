@@ -46,10 +46,14 @@ class Module extends BaseModule
     /* @var string */
     public $unconfirmedStatus = User::STATUS_UNCONFIRMED;
 
-    /*  @var string  Email confirmed status []*/
+    /* @var string  Email confirmed status []*/
     public $confirmedStatus = User::STATUS_ACTIVE;
 
+    /* @var boolean */
     public $enableEmailChange = true;
+
+    /* @var boolean */
+    public $enableEmailConfirmation = false;
 
     /* @var string email change confirmation token expire time, eg: "+ 30 minutes" */
     public $emailChangeConfirmationExpireTime = "+ 30 minutes";

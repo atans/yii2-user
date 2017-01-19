@@ -91,17 +91,20 @@ class EmailChangeForm extends Model
         $module = self::getUserModule();
 
         $user = $this->getUser();
+        
+        if ($module->enableEmailConfirmation) {
+            /* @var $userTokenModel \atans\user\models\UserToken */
+            $userTokenModel = Yii::createObject([
+                'class' => $module->modelMap['UserToken'],
+            ]);
 
-        /* @var $userTokenModel \atans\user\models\UserToken */
-        $userTokenModel = Yii::createObject([
-            'class' => $module->modelMap['UserToken'],
-        ]);
+            $expiredAt = date('Y-m-d H:i:s', strtotime($module->emailChangeConfirmationExpireTime));
+            $userToken = $userTokenModel::generate($user->id, $userTokenModel::TYPE_EMAIL_CHANGE, $this->newEmail, $expiredAt);
 
-        $expiredAt = date('Y-m-d H:i:s', strtotime($module->emailChangeConfirmationExpireTime));
-
-        $userToken = $userTokenModel::generate($user->id, $userTokenModel::TYPE_EMAIL_CHANGE, $this->newEmail, $expiredAt);
-
-        $this->getMailer()->sendEmailConfirmation($user, $userToken);
+            $this->getMailer()->sendEmailConfirmation($user, $userToken);
+        } else {
+            $user->changeEmail($this->newEmail);
+        }
 
         return true;
     }

@@ -39,17 +39,22 @@ class EmailController extends Controller
      */
     public function actionChange()
     {
-        if (! self::getUserModule()->enableEmailChange) {
+        $module = static::getUserModule();
+        if (! $module->enableEmailChange) {
             throw new NotFoundHttpException("Email change is disabled.");
         }
 
         /* @var $model \atans\user\models\forms\EmailChangeForm */
         $model = Yii::createObject([
-            'class' => static::getUserModule()->modelMap['EmailChangeForm'],
+            'class' => $module->modelMap['EmailChangeForm'],
         ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->change()) {
-            Yii::$app->session->setFlash('success', Yii::t('user', "Please check your email and click the confirm link."));
+            if ($module->enableEmailConfirmation) {
+                Yii::$app->session->setFlash('success', Yii::t('user', "Please check your email and click the confirm link."));
+            } else {
+                Yii::$app->session->setFlash('success', Yii::t('user', "Your email has been changed."));
+            }
 
             return $this->refresh();
         }
@@ -70,8 +75,12 @@ class EmailController extends Controller
      */
     public function actionConfirm($token)
     {
-        if (! self::getUserModule()->enableEmailChange) {
+        if (! static::getUserModule()->enableEmailChange) {
             throw new NotFoundHttpException("Email change is disabled.");
+        }
+        
+        if (! static::getUserModule()->enableEmailConfirmation) {
+            throw new NotFoundHttpException("Email confirmation is not required.");
         }
 
         /* @var $userTokenModel \atans\user\models\UserToken */
