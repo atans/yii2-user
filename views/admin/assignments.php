@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 
-<div class="user-view">
+<div class="user-admin-assignments">
     <div class="row">
         <div class="col-md-3">
             <div class="panel panel-default">

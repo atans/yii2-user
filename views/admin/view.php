@@ -10,7 +10,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'User'), 'url' => ['
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="user-view">
+<div class="user-admin-view">
     <div class="row">
         <div class="col-md-3">
             <div class="panel panel-default">
@@ -33,6 +33,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => $model->getStatusName(),
                         ],
                         'registration_ip',
+                        'logged_in_ip',
+                        'logged_in_at',
                         'created_at',
                         'updated_at',
                     ],

@@ -3,7 +3,7 @@
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model atans\user\models\forms\LoginForm */
-/* @var $userModule atans\user\Module */
+/* @var $module atans\user\Module */
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -34,11 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div>
                         <?= Html::submitButton(Yii::t('user', 'Login'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
 
-                        <?php if ($userModule->enableRegistration): ?>
+                        <?php if ($module->enableRegistration): ?>
                         <?= Html::a(Yii::t('user', 'Register'), ['/user/register'], ['class' => 'btn btn-link']) ?>
                         <?php endif ?>
 
-                        <?php if ($userModule->enableConfirmation): ?>
+                        <?php if ($module->enableConfirmation): ?>
                             <?= Html::a(Yii::t('user', 'Resend confirmation email'), ['/user/register/resend'], ['class' => 'pull-right btn btn-link']) ?>
                         <?php endif ?>
                     </div>

@@ -7,7 +7,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = Yii::t('user', 'Reset password');
+$this->title = Yii::t('user', 'Reset Password');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <?= $form->field($model, 'newPassword')->passwordInput(['autofocus' => true]) ?>
 
-                    <?= $form->field($model, 'newPasswordRepeat')->passwordInput() ?>
+                    <?= $form->field($model, 'newPasswordConfirm')->passwordInput() ?>
 
                     <div class="form-group">
                         <?= Html::submitButton(Yii::t('user', 'Submit'), ['class' => 'btn btn-primary']) ?>

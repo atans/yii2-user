@@ -1,6 +1,5 @@
 <?php
 
-
 /* @var $this yii\web\View */
 /* @var $model atans\user\models\User */
 
@@ -9,8 +8,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'Users'), 'url' => [
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-
-<div class="user-update">
+<div class="user-admin-update">
     <div class="row">
         <div class="col-md-3">
             <div class="panel panel-default">

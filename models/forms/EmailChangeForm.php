@@ -27,21 +27,6 @@ class EmailChangeForm extends Model
     protected $user;
 
     /**
-     * EmailChangeForm constructor.
-     *
-     * @param Finder $finder
-     * @param Mailer $mailer
-     * @param array $config
-     */
-    public function __construct(Finder $finder, Mailer $mailer, array $config = [])
-    {
-        $this->finder = $finder;
-        $this->mailer = $mailer;
-
-        parent::__construct($config);
-    }
-
-    /**
      * @inheritdoc
      */
     public function rules()
@@ -62,12 +47,12 @@ class EmailChangeForm extends Model
             'newEmailValidate'          => ['newEmail', function($attribute){
                 $user = $this->getUser();
                 if ($this->newEmail) {
-                    if ($user->isEmailChanged($this->newEmail)) {
+                    if (! $user->isEmailChanged($this->newEmail)) {
                         $this->addError($attribute, Yii::t('user', 'Email does not changed.'));
                         return;
                     }
 
-                    if ($this->finder->findUserByEmail($this->newEmail)) {
+                    if ($this->getFinder()->findUserByEmail($this->newEmail)) {
                         $this->addError($attribute, Yii::t('user', 'Email {email} already taken.', ['email' => $this->newEmail]));
                         return;
                     }
@@ -86,7 +71,7 @@ class EmailChangeForm extends Model
     public function attributeLabels()
     {
         return [
-            'password'        => Yii::t('user', 'Current password'),
+            'password'        => Yii::t('user', 'Current Password'),
             'newEmail'        => Yii::t('user', 'New Email'),
             'newEmailConfirm' => Yii::t('user', 'New Email Confirm'),
         ];
@@ -103,19 +88,20 @@ class EmailChangeForm extends Model
             return null;
         }
 
+        $module = self::getUserModule();
+
         $user = $this->getUser();
 
         /* @var $userTokenModel \atans\user\models\UserToken */
         $userTokenModel = Yii::createObject([
-            'class' => static::getUserModule()->modelMap['UserToken'],
+            'class' => $module->modelMap['UserToken'],
         ]);
 
-        $expiredAt = date('Y-m-d H:i:s', strtotime('TODO'));
+        $expiredAt = date('Y-m-d H:i:s', strtotime($module->emailChangeConfirmationExpireTime));
 
         $userToken = $userTokenModel::generate($user->id, $userTokenModel::TYPE_EMAIL_CHANGE, $this->newEmail, $expiredAt);
 
-        // TODO
-        $this->mailer->sendEmailConfirmation($user, $userToken);
+        $this->getMailer()->sendEmailConfirmation($user, $userToken);
 
         return true;
     }
@@ -130,5 +116,33 @@ class EmailChangeForm extends Model
         }
 
         return $this->user;
+    }
+
+    /**
+     * Get finder
+     *
+     * @return Finder
+     */
+    protected function getFinder()
+    {
+        if (! $this->finder) {
+            $this->finder = Yii::$container->get(Finder::className());
+        }
+
+        return $this->finder;
+    }
+
+    /**
+     * Get mailer
+     *
+     * @return Mailer|object
+     */
+    protected function getMailer()
+    {
+        if (! $this->mailer) {
+            $this->mailer = Yii::$container->get(Mailer::className());
+        }
+
+        return $this->mailer;
     }
 }

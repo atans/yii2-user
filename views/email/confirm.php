@@ -1,19 +1,19 @@
 <?php
 use yii\helpers\Html;
-/**
- * @var yii\web\View $this
- * @var bool $success
- * @var string $email
- */
+
+/* @var $this yii\web\View  */
+/* @var $userToken atans\user\models\UserToken  */
+/* @var $success boolean */
+
 $this->title = Yii::t('user', $success ? 'Confirmed' : 'Error');
 ?>
-<div class="user-confirmation-confirm">
+<div class="user-email-confirm">
 
     <div class="jumbotron">
         <h1><?= Html::encode($this->title) ?></h1>
         <p class="lead">
             <?php if ($success): ?>
-                <?= Yii::t("user", "Your email {email} has been confirmed", ["email" => $email]) ?>
+                <?= Yii::t("user", "Your new email {email} has been confirmed.", ["email" => $userToken->data]) ?>
             <?php else: ?>
                 <?= Yii::t("user", "Invalid token") ?>
             <?php endif ?>
@@ -21,9 +21,6 @@ $this->title = Yii::t('user', $success ? 'Confirmed' : 'Error');
         <p>
             <?= Html::a(Yii::t("user", "Go home"), Yii::$app->getHomeUrl(), ['class' => 'btn btn-lg btn-success']) ?>
 
-            <?php if ($success && Yii::$app->user->getIsGuest()): ?>
-                <?= Html::a(Yii::t("user", "Login"),['/user/login'], ['class' => 'btn btn-lg btn-success']) ?>
-            <?php endif ?>
         </p>
     </div>
 

@@ -13,7 +13,7 @@ class PasswordChangeForm extends Model
 
     public $password;
     public $newPassword;
-    public $newPasswordRepeat;
+    public $newPasswordConfirm;
 
     /**
      * @var User
@@ -38,8 +38,8 @@ class PasswordChangeForm extends Model
             'newPasswordTrim' => ['newPassword', 'trim'],
             'newPasswordString' => ['newPassword', 'string', 'min' => self::getUserModule()->passwordMinLength],
 
-            'newPasswordRepeatRequired' => ['newPasswordRepeat', 'required'],
-            'newPasswordRepeatCompare' => ['newPasswordRepeat', 'compare', 'compareAttribute' => 'newPassword'],
+            'newPasswordConfirmRequired' => ['newPasswordConfirm', 'required'],
+            'newPasswordConfirmCompare' => ['newPasswordConfirm', 'compare', 'compareAttribute' => 'newPassword'],
         ];
     }
 
@@ -49,9 +49,9 @@ class PasswordChangeForm extends Model
     public function attributeLabels()
     {
         return [
-            'password'          => Yii::t('user', 'Current password'),
+            'password'          => Yii::t('user', 'Current Password'),
             'newPassword'       => Yii::t('user', 'New Password'),
-            'newPasswordRepeat' => Yii::t('user', 'New Password repeat'),
+            'newPasswordConfirm' => Yii::t('user', 'New Password Confirm'),
         ];
     }
 

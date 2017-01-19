@@ -2,6 +2,7 @@
 
 namespace atans\user\models;
 
+use atans\user\Finder;
 use atans\user\Mailer;
 use atans\user\traits\UserModuleTrait;
 use atans\user\traits\StatusTrait;
@@ -20,13 +21,14 @@ use yii\web\NotAcceptableHttpException;
  * @property integer $id
  * @property string $username
  * @property string $password_hash
- * @property string $password_reset_token
  * @property string $email
  * @property string $auth_key
  * @property string $registration_ip
  * @property string $status
- * @property integer $created_at
- * @property integer $updated_at
+ * @property string $logged_in_ip
+ * @property string $logged_in_at
+ * @property string $created_at
+ * @property string $updated_at
  * @property string $password write-only password
  *
  * @property-read Mailer $mailer
@@ -45,7 +47,6 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_INACTIVE          = 'inactive';
     const STATUS_ACTIVE            = 'active';
     const STATUS_DELETED           = 'deleted';
-    const STATUS_UNCONFIRMED_EMAIL = 'unconfirmed_email';
     const STATUS_PENDING           = 'pending';
     const STATUS_BLOCKED           = 'blocked';
 
@@ -55,7 +56,25 @@ class User extends ActiveRecord implements IdentityInterface
     const EVENT_BEFORE_REGISTER = 'before_register';
     const EVENT_AFTER_REGISTER  = 'after_register';
 
-    private $password;
+    /* @var string */
+    protected $password;
+
+    /* @var Finder $finder */
+    protected $finder;
+
+    /* @var Mailer $mailer */
+    protected $mailer;
+
+    /**
+     * User constructor.
+     *
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        parent::__construct($config);
+    }
+
 
     /**
      * @inheritdoc
@@ -101,7 +120,7 @@ class User extends ActiveRecord implements IdentityInterface
             'emailFilter'      => ['email', 'filter', 'filter' => 'strtolower'],
             'emailPattern'     => ['email', 'email'],
             'emailLength'      => ['email', 'string', 'max' => $module->emailMaxLength],
-            'emailUnique'      => ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used')],
+            'emailUnique'      => ['email', 'unique', 'message' => Yii::t('user', 'The email has been already used.')],
 
             'passwordRequired' => ['password', 'required', 'on' => [static::SCENARIO_REGISTER, static::SCENARIO_CREATE]],
             'passwordLength'   => ['password', 'string', 'min' => $module->passwordMinLength],
@@ -125,7 +144,6 @@ class User extends ActiveRecord implements IdentityInterface
         $scenarios[static::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         $scenarios[static::SCENARIO_CREATE]   = ['username', 'email', 'password', 'status'];
         $scenarios[static::SCENARIO_UPDATE]   = ['username', 'email', 'password', 'status'];
-        $scenarios[static::SCENARIO_CHANGE_EMAIL]   = ['email'];
 
         return $scenarios;
     }
@@ -139,6 +157,8 @@ class User extends ActiveRecord implements IdentityInterface
             'username'        => Yii::t('user', 'Username'),
             'email'           => Yii::t('user', 'Email'),
             'registration_ip' => Yii::t('user', 'Registration IP'),
+            'logged_in_ip'    => Yii::t('user', 'Logged in IP'),
+            'logged_in_at'    => Yii::t('user', 'Logged in At'),
             'status'          => Yii::t('user', 'Status'),
             'created_at'      => Yii::t('user', 'Created At'),
             'Updated_at'      => Yii::t('user', 'Updated At'),
@@ -152,11 +172,13 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             static::STATUS_PENDING => Yii::t('user', 'Pending'),
+            static::STATUS_UNCONFIRMED  => Yii::t('user', 'Unconfirmed'),
             static::STATUS_ACTIVE  => Yii::t('user', 'Active'),
             static::STATUS_BLOCKED => Yii::t('user', 'Blocked'),
+            static::STATUS_DELETED => Yii::t('user', 'Deleted'),
+            static::STATUS_PENDING => Yii::t('user', 'Pending'),
         ];
     }
-
 
     /**
      * @inheritdoc
@@ -174,45 +196,6 @@ class User extends ActiveRecord implements IdentityInterface
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
 
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        return static::findOne(['username' => $username]);
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsernameOrEmail($username)
-    {
-        return static::findOne(['username' => $username]);
-    }
-
-    /**
-     * Finds user by password reset token
-     *
-     * @param string $token password reset token
-     * @return static|null
-     */
-    public static function findByPasswordResetToken($token)
-    {
-        if (! static::isPasswordResetTokenValid($token)) {
-            return null;
-        }
-
-        return static::findOne([
-            'password_reset_token' => $token,
-            'status'               => static::STATUS_ACTIVE,
-        ]);
-    }
 
     /**
      * @inheritdoc
@@ -274,22 +257,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Generates new password reset token
-     */
-    public function generatePasswordResetToken()
-    {
-        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
-    }
-
-    /**
-     * Removes password reset token
-     */
-    public function removePasswordResetToken()
-    {
-        $this->password_reset_token = null;
-    }
-
-    /**
      * Activate account
      *
      * @return bool
@@ -300,7 +267,7 @@ class User extends ActiveRecord implements IdentityInterface
             return false;
         }
 
-        return (bool)$this->updateAttributes(['status' => static::STATUS_ACTIVE]);
+        return (bool) $this->updateAttributes(['status' => static::STATUS_ACTIVE]);
     }
 
     /**
@@ -310,7 +277,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function block()
     {
-        return (bool)$this->updateAttributes(['status' => static::STATUS_BLOCKED]);
+        return (bool) $this->updateAttributes(['status' => static::STATUS_BLOCKED]);
     }
 
     /**
@@ -320,9 +287,14 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function unblock()
     {
-        return (bool)$this->updateAttributes(['status' => static::STATUS_ACTIVE]);
+        return (bool) $this->updateAttributes(['status' => static::STATUS_ACTIVE]);
     }
 
+    /**
+     * Get user blocked or not
+     *
+     * @return bool
+     */
     public function getIsBlocked()
     {
         return $this->status == static::STATUS_BLOCKED;
@@ -381,6 +353,35 @@ class User extends ActiveRecord implements IdentityInterface
 
             Yii::warning($e->getMessage());
             throw $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * Update login data
+     *
+     * @return bool
+     */
+    public function updateLoginData()
+    {
+        $transaction = Yii::$app->getDb()->beginTransaction();
+
+        try {
+            $this->logged_in_ip = Yii::$app->request->userIP;
+            $this->logged_in_at = date("Y-m-d H:i:s");
+
+            if (! $this->save(false, ["logged_in_ip", "logged_in_at"])) {
+                throw new Exception('User can not update login data');
+            }
+
+            $transaction->commit();
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+
+            Yii::warning($e->getMessage());
+
+            return false;
         }
 
         return true;
@@ -457,16 +458,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function confirm()
     {
         $transaction = Yii::$app->getDb()->beginTransaction();
-        $userModule = static::getUserModule();
+        $module = static::getUserModule();
 
         try {
             // Incorrect unconfirmed status
-            if ($this->status !== $userModule->unconfirmedStatus) {
+            if ($this->status !== $module->unconfirmedStatus) {
                 return false;
             }
 
             // Account is confirmed
-            if ($this->status == $userModule->confirmedStatus) {
+            if ($this->status == $module->confirmedStatus) {
                 return true;
             }
 
@@ -488,14 +489,30 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
-    public function changeEmail($email)
+    /**
+     * Change email
+     *
+     * @param $newEmail
+     * @return bool
+     * @throws \Exception
+     */
+    public function changeEmail($newEmail)
     {
+        if (! static::getUserModule()->enableEmailChange) {
+            throw new NotSupportedException('Email change is disabled.');
+        }
+
+        // Email already taken
+        if ($this->getFinder()->findUserByEmail($newEmail)) {
+            return false;
+        }
+
         $transaction = $this->getDb()->beginTransaction();
 
         try {
-            $this->email = $email;
+            $this->email = $newEmail;
 
-            if (! $this->save()) {
+            if (! $this->save(false, ['email'])) {
                 throw new Exception('User can not change email');
             }
 
@@ -510,6 +527,12 @@ class User extends ActiveRecord implements IdentityInterface
         return true;
     }
 
+    /**
+     * Check email change or not
+     *
+     * @param $newEmail
+     * @return bool
+     */
     public function isEmailChanged($newEmail)
     {
         return $this->email !== $newEmail;
@@ -546,20 +569,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * send new password to user
-     *
-     * @return bool
-     */
-    public function resendPassword()
-    {
-        $password = Yii::$app->security->generateRandomString(8);
-        $this->setPassword($password);
-        $this->save(false, ['password_hash']);
-
-        return $this->getMailer()->sendGeneratedPassword($this, $password);
-    }
-
-    /**
      * @inheritdoc
      */
     public function beforeSave($insert)
@@ -575,12 +584,30 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Get finder
+     *
+     * @return Finder
+     */
+    protected function getFinder()
+    {
+        if (! $this->finder) {
+            $this->finder = Yii::$container->get(Finder::className());
+        }
+
+        return $this->finder;
+    }
+
+    /**
      * Get mailer
      *
      * @return Mailer|object
      */
     protected function getMailer()
     {
-        return Yii::$container->get(Mailer::className());
+        if (! $this->mailer) {
+            $this->mailer = Yii::$container->get(Mailer::className());
+        }
+
+        return $this->mailer;
     }
 }

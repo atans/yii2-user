@@ -22,9 +22,7 @@ class AdminController extends Controller
 
     const URL_REMEMBER = 'user-admin';
 
-    /**
-     * @var Finder
-     */
+    /* @var Finder */
     protected $finder;
 
     /**
@@ -53,18 +51,6 @@ class AdminController extends Controller
                 ],
             ],
         ];
-    }
-
-    /**
-     * @param string $id
-     * @param \yii\base\Module $module
-     * @param Finder $finder
-     * @param array $config
-     */
-    public function __construct($id, $module, Finder $finder, $config = [])
-    {
-        $this->finder = $finder;
-        parent::__construct($id, $module, $config);
     }
 
     public function actionIndex()
@@ -205,7 +191,7 @@ class AdminController extends Controller
      */
     protected function findModel($id)
     {
-        $user = $this->finder->findUserById($id);
+        $user = $this->getFinder()->findUserById($id);
 
         if (! $user) {
             throw new NotFoundHttpException('The requested page does not exist');
@@ -214,4 +200,17 @@ class AdminController extends Controller
         return $user;
     }
 
+    /**
+     * Get finder
+     *
+     * @return Finder
+     */
+    protected function getFinder()
+    {
+        if (! $this->finder) {
+            $this->finder = Yii::$container->get(Finder::className());
+        }
+
+        return $this->finder;
+    }
 }

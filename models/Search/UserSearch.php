@@ -12,6 +12,8 @@ class UserSearch extends Model
     public $username;
     public $email;
     public $registration_ip;
+    public $logged_in_ip;
+    public $logged_in_at;
     public $status;
 
     protected $finder;
@@ -35,7 +37,7 @@ class UserSearch extends Model
     public function rules()
     {
         return [
-            [['id', 'username', 'email', 'registration_ip', 'status'], 'safe'],
+            [['id', 'username', 'email', 'registration_ip', 'logged_in_ip', 'logged_in_at', 'status'], 'safe'],
         ];
     }
 
@@ -60,6 +62,8 @@ class UserSearch extends Model
             ->andFilterWhere(['like', 'username', $this->username])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'registration_ip', $this->registration_ip])
+            ->andFilterWhere(['like', 'logged_in_ip', $this->registration_ip])
+            ->andFilterWhere(['like', 'logged_in_at', $this->registration_ip])
             ->andFilterWhere(['like', 'status', $this->status]);
 
 

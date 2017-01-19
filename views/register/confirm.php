@@ -1,13 +1,13 @@
 <?php
 use yii\helpers\Html;
-/**
- * @var yii\web\View $this
- * @var atans\user\models\UserToken $userToken
- * @var bool $success
- */
+
+/* @var $this yii\web\View  */
+/* @var $userToken atans\user\models\UserToken */
+/* @var $success bool */
+
 $this->title = Yii::t('user', $success ? 'Confirmed' : 'Error');
 ?>
-<div class="user-confirmation-confirm">
+<div class="user-register">
 
     <div class="jumbotron">
         <h1><?= Html::encode($this->title) ?></h1>

@@ -7,16 +7,14 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = Yii::t('user', 'Change password');
+$this->title = Yii::t('user', 'Change Password');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="user-login">
-    <h3><?= Html::encode($this->title) ?></h3>
-
+<div class="user-password-change">
     <div class="box">
+        <div class="box-header"><?= Html::encode($this->title) ?></div>
         <div class="box-body">
-
             <div class="row">
                 <div class="col-lg-5">
                     <?php $form = ActiveForm::begin([
@@ -29,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <?= $form->field($model, 'newPassword')->passwordInput() ?>
 
-                    <?= $form->field($model, 'newPasswordRepeat')->passwordInput() ?>
+                    <?= $form->field($model, 'newPasswordConfirm')->passwordInput() ?>
 
                     <div class="form-group">
                         <?= Html::submitButton(Yii::t('user', 'Submit'), ['class' => 'btn btn-primary']) ?>

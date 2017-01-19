@@ -4,8 +4,8 @@ use yii\helpers\Html;
 
 /* @var $user atans\user\models\User */
 /* @var $userToken atans\user\models\UserToken */
-/* @var $module atans\user\Module */
 /* @var $subject string */
+/* @var $module atans\user\Module */
 ?>
 
 <h3><?= Html::encode($subject) ?></h3>

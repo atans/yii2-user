@@ -68,11 +68,11 @@ class RegisterController extends Controller
         }
 
         /** @var $model \atans\user\models\forms\RegistrationForm */
-        $model = Yii::createObject(self::getUserModule()->modelMap['RegistrationForm']);
+        $model = Yii::createObject(static::getUserModule()->modelMap['RegistrationForm']);
 
         $this->performAjaxValidation($model);
 
-        $this->trigger(self::EVENT_BEFORE_REGISTER);
+        $this->trigger(static::EVENT_BEFORE_REGISTER);
         if ($model->load(Yii::$app->request->post()) && $model->register()) {
             $this->trigger(self::EVENT_AFTER_REGISTER);
 
@@ -82,7 +82,7 @@ class RegisterController extends Controller
                 Yii::$app->session->setFlash('success', Yii::t('user', 'Your account has been created.'));
             }
 
-            if (self::getUserModule()->registerRedirect) {
+            if (static::getUserModule()->registerRedirect) {
                 return $this->redirect(self::getUserModule()->registerRedirect);
             }
 
@@ -91,12 +91,12 @@ class RegisterController extends Controller
 
         return $this->render('index', [
             'model'      => $model,
-            'userModule' => static::getUserModule(),
+            'module' => static::getUserModule(),
         ]);
     }
 
     /**
-     * /user/register/confirm?token=xxxx
+     * /user/register/confirm?token=xxxxxxx
      *
      * @param string $token
      * @return \yii\web\Response
@@ -105,7 +105,7 @@ class RegisterController extends Controller
      */
     public function actionConfirm($token)
     {
-        if (! self::getUserModule()->enableConfirmation) {
+        if (! static::getUserModule()->enableConfirmation) {
             throw new NotFoundHttpException('Account confirmation is disabled');
         }
 
@@ -146,7 +146,7 @@ class RegisterController extends Controller
      */
     public function actionResend()
     {
-        if (! self::getUserModule()->enableConfirmation) {
+        if (! static::getUserModule()->enableConfirmation) {
             throw new NotFoundHttpException('Account confirmation is disabled');
         }
 

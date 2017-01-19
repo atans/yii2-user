@@ -30,22 +30,6 @@ class ResendForm extends Model
     protected $user;
 
     /**
-     * ResendForm constructor.
-     *
-     * @param Finder $finder
-     * @param Mailer $mailer
-     * @param array $config
-     */
-    public function __construct(Finder $finder, Mailer $mailer, array $config = [])
-    {
-        $this->finder = $finder;
-        $this->mailer = $mailer;
-
-        parent::__construct($config);
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function rules()
@@ -89,20 +73,20 @@ class ResendForm extends Model
             return null;
         }
 
-        $userModule = static::getUserModule();
+        $module = static::getUserModule();
 
         $user = $this->getUser();
 
         /* @var $userTokenModel \atans\user\models\UserToken */
         $userTokenModel = Yii::createObject([
-            'class' => $userModule->modelMap['UserToken'],
+            'class' => $module->modelMap['UserToken'],
         ]);
 
-        $expiredAt = date('Y-m-d H:i:s', strtotime($userModule->confirmationExpireTime));
+        $expiredAt = date('Y-m-d H:i:s', strtotime($module->confirmationExpireTime));
 
         $userToken = $userTokenModel::generate($user->id, $userTokenModel::TYPE_CONFIRMATION, null, $expiredAt);
 
-        $this->mailer->sendConfirmationMessage($user, $userToken);
+        $this->getMailer()->sendConfirmationMessage($user, $userToken);
 
         return true;
     }
@@ -115,9 +99,37 @@ class ResendForm extends Model
     protected function getUser()
     {
         if ($this->email) {
-            $this->user = $this->finder->findUserByEmail($this->email);
+            $this->user = $this->getFinder()->findUserByEmail($this->email);
         }
 
         return $this->user;
+    }
+
+    /**
+     * Get finder
+     *
+     * @return Finder
+     */
+    protected function getFinder()
+    {
+        if (! $this->finder) {
+            $this->finder = Yii::$container->get(Finder::className());
+        }
+
+        return $this->finder;
+    }
+
+    /**
+     * Get mailer
+     *
+     * @return Mailer|object
+     */
+    protected function getMailer()
+    {
+        if (! $this->mailer) {
+            $this->mailer = Yii::$container->get(Mailer::className());
+        }
+
+        return $this->mailer;
     }
 }

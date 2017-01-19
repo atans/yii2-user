@@ -36,11 +36,11 @@ class LogoutController extends Controller
      */
     public function actionIndex()
     {
-        $this->trigger(self::EVENT_BEFORE_LOGOUT);
+        $this->trigger(static::EVENT_BEFORE_LOGOUT);
         Yii::$app->getUser()->logout();
-        $this->trigger(self::EVENT_AFTER_LOGOUT);
+        $this->trigger(static::EVENT_AFTER_LOGOUT);
         
-        if ($logoutRedirect = self::getUserModule()->logoutRedirect) {
+        if ($logoutRedirect = static::getUserModule()->logoutRedirect) {
             return $this->redirect($logoutRedirect);
         }
 

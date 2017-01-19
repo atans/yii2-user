@@ -37,11 +37,11 @@ class PasswordController extends Controller
     {
         /* @var $model \atans\user\models\forms\PasswordChangeForm */
         $model = Yii::createObject([
-            'class' => self::getUserModule()->modelMap['PasswordChangeForm'],
+            'class' => static::getUserModule()->modelMap['PasswordChangeForm'],
         ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->change()) {
-            Yii::$app->session->setFlash('success', Yii::t('user', 'Password has benn changed.'));
+            Yii::$app->session->setFlash('success', Yii::t('user', 'Password has been changed.'));
             return $this->refresh();
         }
 
@@ -52,16 +52,18 @@ class PasswordController extends Controller
 
     /**
      * /user/password/forgot
+     *
+     * @return string|\yii\web\Response
      */
     public function actionForgot()
     {
         /* @var $model \atans\user\models\forms\PasswordForgotForm */
         $model = Yii::createObject([
-            'class' => self::getUserModule()->modelMap['PasswordForgotForm'],
+            'class' => static::getUserModule()->modelMap['PasswordForgotForm'],
         ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->sendForgotEmail()) {
-            Yii::$app->session->setFlash('success', Yii::t('user', 'Password reset email has been sent'));
+            Yii::$app->session->setFlash('success', Yii::t('user', 'Password reset email has been sent.'));
             return $this->refresh();
         }
 
@@ -95,17 +97,17 @@ class PasswordController extends Controller
         ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            /* @var $userClass \atans\user\models\User */
-            $userClass = self::getUserModule()->modelMap["User"];
+            /* @var $userModel \atans\user\models\User */
+            $userModel = self::getUserModule()->modelMap["User"];
 
             /* @var $user \atans\user\models\User */
-            $user = $userClass::findOne($userToken->user_id);
+            $user = $userModel::findOne($userToken->user_id);
 
             $user->changePassword($model->newPassword);
 
             $userToken->delete();
 
-            Yii::$app->session->setFlash('success', Yii::t('user', 'Password has been reset'));
+            Yii::$app->session->setFlash('success', Yii::t('user', 'Password has been reset.'));
 
             return $this->refresh();
         }

@@ -30,9 +30,6 @@ class Mailer extends Component
     /** @var string */
     protected $forgotPasswordSubject;
 
-    /** @var Module */
-    protected $module;
-
     /**
      * Send welcome message
      * From: /user/register
@@ -69,13 +66,21 @@ class Mailer extends Component
             $user->email,
             $subject,
             'confirmation',
-            ['user' => $user, 'userToken' => $userToken, 'subject' => $subject, 'module' => self::getUserModule()]
+            ['user' => $user, 'userToken' => $userToken, 'subject' => $subject, 'module' => static::getUserModule()]
         );
     }
 
+    /**
+     * Email change confirmation message
+     * From: /user/email/change
+     *
+     * @param User $user
+     * @param UserToken $userToken
+     * @return bool
+     */
     public function sendEmailConfirmation(User $user, UserToken $userToken)
     {
-        $email = $userToken->data ? $userToken->data : $user->email;
+        $email = $userToken->data;
 
         $subject = $this->getEmailConfirmationSubject();
 
@@ -83,7 +88,7 @@ class Mailer extends Component
             $email,
             $subject,
             'email_confirmation',
-            ['user' => $user, 'userToken' => $userToken, 'subject' => $subject, 'module' => self::getUserModule()]
+            ['user' => $user, 'userToken' => $userToken, 'subject' => $subject, 'module' => static::getUserModule()]
         );
     }
 
@@ -103,7 +108,7 @@ class Mailer extends Component
             $user->email,
             $subject,
             'forgot_password',
-            ['user' => $user, 'userToken' => $userToken, 'subject' => $subject, 'module' => self::getUserModule()]
+            ['user' => $user, 'userToken' => $userToken, 'subject' => $subject, 'module' => static::getUserModule()]
         );
     }
 
@@ -157,7 +162,7 @@ class Mailer extends Component
     public function getEmailConfirmationSubject()
     {
         if (is_null($this->emailConfirmationSubject)) {
-            $this->emailConfirmationSubject = Yii::t('user', 'Email Confirmation on {name}', ['name' => Yii::$app->name]);
+            $this->emailConfirmationSubject = Yii::t('user', 'Email confirmation on {name}', ['name' => Yii::$app->name]);
         }
 
         return $this->emailConfirmationSubject;

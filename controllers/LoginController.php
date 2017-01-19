@@ -55,8 +55,8 @@ class LoginController extends Controller
         }
 
         return $this->render('index', [
-            'model'      => $model,
-            'userModule' => static::getUserModule(),
+            'model'  => $model,
+            'module' => static::getUserModule(),
         ]);
     }
 }

@@ -9,8 +9,8 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="user-form">
-    <div class="box">
+<div class="user-admin-form">
+    <div class="box box-primary">
         <div class="box-body">
             <?php $form = ActiveForm::begin([
                 'enableAjaxValidation' => true,

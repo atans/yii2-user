@@ -7,7 +7,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = Yii::t('user', 'Resend confirmation email');
+$this->title = Yii::t('user', 'Resend Confirmation Email');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

@@ -62,6 +62,9 @@ class UserToken extends ActiveRecord
             case static::TYPE_CONFIRMATION:
                 $route = '/user/register/confirm';
                 break;
+            case static::TYPE_EMAIL_CHANGE:
+                $route = '/user/email/confirm';
+                break;
             case static::TYPE_FORGOT_PASSWORD:
                 $route = '/user/password/reset';
                 break;
@@ -69,7 +72,7 @@ class UserToken extends ActiveRecord
                 throw new Exception('Invalid token type');
         }
 
-        return Url::to([$route, 'id' => $this->user_id, 'token' => $this->token], true);
+        return Url::to([$route, 'token' => $this->token], true);
     }
 
     /**

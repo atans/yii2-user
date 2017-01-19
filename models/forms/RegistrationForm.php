@@ -13,7 +13,7 @@ class RegistrationForm extends Model
     public $username;
     public $email;
     public $password;
-    public $passwordRepeat;
+    public $newPasswordConfirm;
 
     /**
      * @inheritdoc
@@ -34,13 +34,13 @@ class RegistrationForm extends Model
             'emailFilter'      => ['email', 'filter', 'filter' => 'strtolower'],
             'emailPattern'     => ['email', 'email'],
             'emailLength'      => ['email', 'string', 'max' => $module->emailMaxLength],
-            'emailUnique'      => ['email', 'unique',  'targetClass' => $module->modelMap['User'],'message' => Yii::t('user', 'The email has been already used')],
+            'emailUnique'      => ['email', 'unique',  'targetClass' => $module->modelMap['User'],'message' => Yii::t('user', 'The email has been already used.')],
 
             'passwordRequired' => ['password', 'required'],
             'passwordLength'   => ['password', 'string', 'min' => $module->passwordMinLength],
 
-            'passwordRepeatRequired' => ['password', 'required'],
-            'passwordRepeatCompare'  => ['passwordRepeat', 'compare', 'compareAttribute' => 'password'],
+            'newPasswordConfirmRequired' => ['password', 'required'],
+            'newPasswordConfirmCompare'  => ['newPasswordConfirm', 'compare', 'compareAttribute' => 'password'],
         ];
     }
 
@@ -50,10 +50,10 @@ class RegistrationForm extends Model
     public function attributeLabels()
     {
         return [
-            'username'       => Yii::t('user', 'Username'),
-            'email'          => Yii::t('user', 'Email'),
-            'password'       => Yii::t('user', 'Password'),
-            'passwordRepeat' => Yii::t('user', 'Password Repeat'),
+            'username'           => Yii::t('user', 'Username'),
+            'email'              => Yii::t('user', 'Email'),
+            'password'           => Yii::t('user', 'Password'),
+            'newPasswordConfirm' => Yii::t('user', 'Password Confirm'),
         ];
     }
 
@@ -70,7 +70,7 @@ class RegistrationForm extends Model
 
         /* @var $user User */
         $user = Yii::createObject([
-            'class' => self::getUserModule()->modelMap['User'],
+            'class' => static::getUserModule()->modelMap['User'],
             'scenario' => User::SCENARIO_REGISTER,
         ]);
         $user->setAttributes($this->getAttributes());

@@ -1,6 +1,5 @@
 <?php
 
-
 /* @var $this yii\web\View */
 /* @var $model atans\user\models\User */
 
@@ -9,10 +8,8 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'Users'), 'url' => [
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-
-<div class="user-create">
+<div class="user-admin-create">
     <?= $this->render('_form', [
         'model' => $model,
     ]) ?>
-
 </div>

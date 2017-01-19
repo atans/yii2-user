@@ -28,12 +28,10 @@ class LoginForm extends Model
     /**
      * Constructor
      *
-     * @param Finder $finder
      * @param array $config
      */
-    public function __construct(Finder $finder, $config = [])
+    public function __construct($config = [])
     {
-        $this->finder     = $finder;
         $this->rememberMe = self::getUserModule()->defaultRememberMe;
 
         parent::__construct($config);
@@ -91,7 +89,15 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? self::getUserModule()->rememberMeDuration : 0);
+            $user = $this->getUser();
+
+            $success = Yii::$app->user->login($user, $this->rememberMe ? self::getUserModule()->rememberMeDuration : 0);
+
+            if ($success) {
+                $user->updateLoginData();
+            }
+
+            return $success;
         }
 
         return false;
@@ -105,9 +111,23 @@ class LoginForm extends Model
     protected function getUser()
     {
         if ($this->user === null) {
-            $this->user = $this->finder->findUserByUsernameOrEmail($this->username);
+            $this->user = $this->getFinder()->findUserByUsernameOrEmail($this->username);
         }
 
         return $this->user;
+    }
+
+    /**
+     * Get finder
+     *
+     * @return Finder
+     */
+    protected function getFinder()
+    {
+        if (! $this->finder) {
+            $this->finder = Yii::$container->get(Finder::className());
+        }
+
+        return $this->finder;
     }
 }

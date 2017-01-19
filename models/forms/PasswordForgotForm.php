@@ -59,7 +59,7 @@ class PasswordForgotForm extends Model
             'emailExist' => ['email', function($attribute){
                 $user = $this->getUser();
                 if (! $user) {
-                    $this->addError($attribute, Yii::t('user', "Email does not found"));
+                    $this->addError($attribute, Yii::t('user', "Email does not found."));
                 }
             }],
         ];

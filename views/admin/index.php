@@ -5,17 +5,17 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel atans\user\models\UserSearch */
+/* @var $searchModel atans\user\models\Search\UserSearch */
 /* @var $model atans\user\models\User */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('user', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="bank-index">
+<div class="user-admin-index">
 
     <p>
-        <?= Html::a(Yii::t('user', 'Create'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('user', 'Create User'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= $this->render('_menu') ?>
@@ -26,15 +26,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'columns' => [
-                //['class' => 'yii\grid\SerialColumn'],
-
                 'id',
                 'username',
                 'email',
+                'registration_ip',
+                'logged_in_ip',
+                'logged_in_at',
                 [
                     'attribute' => 'status',
                     'format'    => 'raw',
                     'value' => function($model){
+                        /* @var $model \atans\user\models\User */
+
                         switch ($model->status) {
                             case User::STATUS_ACTIVE:
                                 $class = 'label-success';

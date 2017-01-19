@@ -45,7 +45,7 @@ class AccountController extends Controller
 
         return $this->render('index', [
             'model'      => $model,
-            'userModule' => static::getUserModule(),
+            'module' => static::getUserModule(),
         ]);
     }
 }

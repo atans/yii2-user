@@ -12,7 +12,7 @@ class PasswordResetForm extends Model
     use UserModuleTrait;
 
     public $newPassword;
-    public $newPasswordRepeat;
+    public $newPasswordConfirm;
 
     /**
      * @var User
@@ -29,8 +29,8 @@ class PasswordResetForm extends Model
             'newPasswordTrim' => ['newPassword', 'trim'],
             'newPasswordString' => ['newPassword', 'string', 'min' => self::getUserModule()->passwordMinLength],
 
-            'newPasswordRepeatRequired' => ['newPasswordRepeat', 'required'],
-            'newPasswordRepeatCompare' => ['newPasswordRepeat', 'compare', 'compareAttribute' => 'newPassword'],
+            'newPasswordConfirmRequired' => ['newPasswordConfirm', 'required'],
+            'newPasswordConfirmCompare' => ['newPasswordConfirm', 'compare', 'compareAttribute' => 'newPassword'],
         ];
     }
 
@@ -41,7 +41,7 @@ class PasswordResetForm extends Model
     {
         return [
             'newPassword'       => Yii::t('user', 'New Password'),
-            'newPasswordRepeat' => Yii::t('user', 'New Password repeat'),
+            'newPasswordConfirm' => Yii::t('user', 'New Password Confirm'),
         ];
     }
 }
