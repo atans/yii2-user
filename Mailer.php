@@ -7,10 +7,14 @@ use atans\user\models\UserToken;
 use atans\user\traits\UserModuleTrait;
 use Yii;
 use yii\base\Component;
+use yii\mail\BaseMailer;
 
 class Mailer extends Component
 {
     use UserModuleTrait;
+
+    /* @var BaseMailer */
+    protected $mailer;
     
     /** @var string */
     public $viewPath = '@atans/user/views/mail';
@@ -207,8 +211,7 @@ class Mailer extends Component
      */
     protected function sendMessage($to, $subject, $view, $params= [])
     {
-        /* @var $mailer \yii\mail\BaseMailer */
-        $mailer = Yii::$app->mailer;
+        $mailer = $this->getMailer();
         $mailer->viewPath = $this->viewPath;
         $mailer->getView()->theme = Yii::$app->view->theme;
 
@@ -221,5 +224,33 @@ class Mailer extends Component
             ->setFrom($this->sender)
             ->setSubject($subject)
             ->send();
+    }
+
+    /**
+     * Get mailer
+     *
+     * @return BaseMailer
+     */
+    public function getMailer()
+    {
+        if (! $this->mailer) {
+            $this->setMailer(Yii::$app->mailer);
+        }
+
+        return $this->mailer;
+    }
+
+    /**
+     * Set mailer
+     *
+     * @param $mailer
+     */
+    public function setMailer($mailer)
+    {
+        if (is_array($mailer) && isset($mailer['class'])) {
+            $mailer = Yii::createObject($mailer);
+        }
+
+        $this->mailer = $mailer;
     }
 }
