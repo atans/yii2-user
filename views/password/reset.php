@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="user-password-reset">
-    <div class="box">
+    <div class="box box-primary">
         <div class="box-header"><?= Html::encode($this->title) ?></div>
         <div class="box-body">
             <div class="row">
@@ -23,9 +23,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         'enableClientValidation' => false,
                     ]); ?>
 
-                    <?= $form->field($model, 'newPassword')->passwordInput(['autofocus' => true]) ?>
+                    <?= $form->field($model, 'newPassword')->passwordInput(['autofocus' => true, 'value' => '']) ?>
 
-                    <?= $form->field($model, 'newPasswordConfirm')->passwordInput() ?>
+                    <?= $form->field($model, 'newPasswordConfirm')->passwordInput(['value' => '']) ?>
 
                     <div class="form-group">
                         <?= Html::submitButton(Yii::t('user', 'Submit'), ['class' => 'btn btn-primary']) ?>

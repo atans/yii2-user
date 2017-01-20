@@ -87,6 +87,7 @@ class PasswordController extends Controller
 
         $userToken = $userTokenModel::findByToken($token, $userTokenModel::TYPE_FORGOT_PASSWORD);
 
+
         if (! $userToken) {
             throw new NotFoundHttpException('Token does not found');
         }
@@ -103,13 +104,11 @@ class PasswordController extends Controller
             /* @var $user \atans\user\models\User */
             $user = $userModel::findOne($userToken->user_id);
 
-            $user->changePassword($model->newPassword);
-
             $userToken->delete();
 
-            Yii::$app->session->setFlash('success', Yii::t('user', 'Password has been reset.'));
+            $user->changePassword($model->newPassword);
 
-            return $this->refresh();
+            Yii::$app->session->setFlash('success', Yii::t('user', 'Password has been reset.'));
         }
 
         return $this->render('reset', [
