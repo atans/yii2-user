@@ -13,7 +13,7 @@ class RegistrationForm extends Model
     public $username;
     public $email;
     public $password;
-    public $newPasswordConfirm;
+    public $passwordConfirm;
 
     /**
      * @inheritdoc
@@ -39,8 +39,8 @@ class RegistrationForm extends Model
             'passwordRequired' => ['password', 'required'],
             'passwordLength'   => ['password', 'string', 'min' => $module->passwordMinLength],
 
-            'newPasswordConfirmRequired' => ['password', 'required'],
-            'newPasswordConfirmCompare'  => ['newPasswordConfirm', 'compare', 'compareAttribute' => 'password'],
+            'passwordConfirmRequired' => ['passwordConfirm', 'required'],
+            'passwordConfirmCompare'  => ['passwordConfirm', 'compare', 'compareAttribute' => 'password'],
         ];
     }
 
@@ -50,10 +50,10 @@ class RegistrationForm extends Model
     public function attributeLabels()
     {
         return [
-            'username'           => Yii::t('user', 'Username'),
-            'email'              => Yii::t('user', 'Email'),
-            'password'           => Yii::t('user', 'Password'),
-            'newPasswordConfirm' => Yii::t('user', 'Password Confirm'),
+            'username'        => Yii::t('user', 'Username'),
+            'email'           => Yii::t('user', 'Email'),
+            'password'        => Yii::t('user', 'Password'),
+            'passwordConfirm' => Yii::t('user', 'Password Confirm'),
         ];
     }
 
