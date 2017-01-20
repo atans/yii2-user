@@ -38,7 +38,7 @@ class Module extends BaseModule
     public $defaultStatus = User::STATUS_ACTIVE;
 
     /* @var boolean After register user default status is Module->unconfirmedStatus if enable */
-    public $enableConfirmation = false;
+    public $enableConfirmation = true;
 
     /* @var string Confirmation token expire time, eg: "+ 30 minutes" */
     public $confirmationExpireTime = "+ 30 minutes";
@@ -53,7 +53,7 @@ class Module extends BaseModule
     public $enableEmailChange = true;
 
     /* @var boolean */
-    public $enableEmailConfirmation = false;
+    public $enableEmailConfirmation = true;
 
     /* @var string email change confirmation token expire time, eg: "+ 30 minutes" */
     public $emailChangeConfirmationExpireTime = "+ 30 minutes";
