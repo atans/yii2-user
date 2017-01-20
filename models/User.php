@@ -434,7 +434,7 @@ class User extends ActiveRecord implements IdentityInterface
             }
 
             // Send welcome message
-            $this->mailer->sendWelcomeMessage($this, $userToken);
+            $this->getMailer()->sendWelcomeMessage($this, $userToken);
 
             $this->trigger(static::EVENT_AFTER_REGISTER);
 
