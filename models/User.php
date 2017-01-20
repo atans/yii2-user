@@ -57,7 +57,7 @@ class User extends ActiveRecord implements IdentityInterface
     const EVENT_AFTER_REGISTER  = 'after_register';
 
     /* @var string */
-    protected $password;
+    private $password;
 
     /* @var Finder $finder */
     protected $finder;
@@ -74,7 +74,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         parent::__construct($config);
     }
-
 
     /**
      * @inheritdoc

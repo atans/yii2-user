@@ -73,7 +73,8 @@ class RegisterForm extends Model
             'class' => static::getUserModule()->modelMap['User'],
             'scenario' => User::SCENARIO_REGISTER,
         ]);
-        $user->setAttributes($this->getAttributes());
+
+        $user->setAttributes($this->attributes);
 
         if (! $user->register()) {
             return false;
