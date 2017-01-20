@@ -16,7 +16,7 @@ class Bootstrap implements BootstrapInterface
         'User'               => 'atans\user\models\User',
         'UserToken'          => 'atans\user\models\UserToken',
         'LoginForm'          => 'atans\user\models\forms\LoginForm',
-        'RegistrationForm'   => 'atans\user\models\forms\RegistrationForm',
+        'RegisterForm'       => 'atans\user\models\forms\RegisterForm',
         'ResendForm'         => 'atans\user\models\forms\ResendForm',
         'EmailChangeForm'    => 'atans\user\models\forms\EmailChangeForm',
         'PasswordChangeForm' => 'atans\user\models\forms\PasswordChangeForm',

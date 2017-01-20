@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\view */
-/* @var $model atans\user\models\forms\RegistrationForm */
+/* @var $model atans\user\models\forms\RegisterForm */
 /* @var $module atans\user\Module */
 
 $this->title                   = Yii::t('user', 'Register');

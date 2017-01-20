@@ -6,7 +6,7 @@ use atans\user\models\User;
 use Yii;
 use yii\base\Model;
 
-class RegistrationForm extends Model
+class RegisterForm extends Model
 {
     use UserModuleTrait;
 
@@ -20,7 +20,7 @@ class RegistrationForm extends Model
      */
     public function rules()
     {
-        $module = self::getUserModule();
+        $module = static::getUserModule();
 
         return [
             'usernameRequired' => ['username', 'required'],

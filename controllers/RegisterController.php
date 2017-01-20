@@ -67,7 +67,7 @@ class RegisterController extends Controller
             throw new NotFoundHttpException('Registration is disabled');
         }
 
-        /** @var $model \atans\user\models\forms\RegistrationForm */
+        /** @var $model \atans\user\models\forms\RegisterForm */
         $model = Yii::createObject(static::getUserModule()->modelMap['RegistrationForm']);
 
         $this->performAjaxValidation($model);
