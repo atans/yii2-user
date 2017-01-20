@@ -68,7 +68,7 @@ class RegisterController extends Controller
         }
 
         /** @var $model \atans\user\models\forms\RegisterForm */
-        $model = Yii::createObject(static::getUserModule()->modelMap['RegistrationForm']);
+        $model = Yii::createObject(static::getUserModule()->modelMap['RegisterForm']);
 
         $this->performAjaxValidation($model);
 
