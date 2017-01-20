@@ -17,7 +17,10 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Your email has been changed.' => '你的電郵已更改。',
+    'Account' => '帳號',
+    'Change email' => '修改電郵',
+    'Change password' => '修改密碼',
+    'Logout' => '登出',
     'A message has been sent to your email. please check your email to confirm this account.' => '信息已發到你的電郵，請查閱你的電郵確認這帳號',
     'Account Details' => '帳號資料',
     'Account {email} does not exist.' => '帳號 {email} 不存在。',
@@ -111,6 +114,7 @@ return [
     'Your account has been created.' => '你的帳號已建立。',
     'Your account is not required to confirm.' => '你的帳號無需要確認。',
     'Your account {email} has been confirmed' => '你的帳號{email}已確認',
+    'Your email has been changed.' => '你的電郵已更改。',
     'Your new email {email} has been confirmed.' => '你的新電郵{email}已確認',
     'Your password has been changed on {name}' => '你的{name｝的密碼已更改。',
 ];

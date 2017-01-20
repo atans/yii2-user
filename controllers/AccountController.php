@@ -22,7 +22,7 @@ class AccountController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
-                    ['allow' => true, 'actions' => ['index', 'change-email'], 'roles' => ['@']],
+                    ['allow' => true, 'actions' => ['index'], 'roles' => ['@']],
                 ],
             ],
         ];
@@ -35,16 +35,14 @@ class AccountController extends Controller
      */
     public function actionIndex()
     {
-        if (! Yii::$app->user->isGuest) {
+        if (Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        // TODO
-        $model = '';
-
+        $user = Yii::$app->user->getIdentity();
 
         return $this->render('index', [
-            'model'      => $model,
+            'user'   => $user,
             'module' => static::getUserModule(),
         ]);
     }
