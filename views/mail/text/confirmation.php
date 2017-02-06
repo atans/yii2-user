@@ -13,7 +13,7 @@ $url = $userToken->getUrl();
 
 <?= Yii::t('user', 'Thank you for register on {name}', ['name' => Yii::$app->name]) ?>.
 
-<?= Yii::t("user", "To complete your registration, please click the link below:") ?>
+<?= Yii::t('user', "To complete your registration, please click the link below:") ?>
 
 <?= Html::a($url, $url) ?>
 

@@ -11,7 +11,7 @@ $url = $userToken->getUrl();
 
 <?= Html::encode($subject) ?>
 
-<?= Yii::t("user", "To confirm your email {email}, please click the link below:", ['email' => $userToken->data]) ?>
+<?= Yii::t('user', "To confirm your email {email}, please click the link below:", ['email' => $userToken->data]) ?>
 
 <?= Html::a($url, $url) ?>
 

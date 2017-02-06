@@ -18,7 +18,7 @@ use yii\helpers\Html;
     <?php
     $url = $userToken->getUrl();
     ?>
-    <p><?= Yii::t("user", "To complete your registration, please click the link below:") ?></p>
+    <p><?= Yii::t('user', "To complete your registration, please click the link below:") ?></p>
 
     <p><?= Html::a($url, $url) ?></p>
 
