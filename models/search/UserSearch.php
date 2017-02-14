@@ -30,7 +30,6 @@ class UserSearch extends Model
         parent::__construct($config);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -40,7 +39,6 @@ class UserSearch extends Model
             [['id', 'username', 'email', 'registration_ip', 'logged_in_ip', 'logged_in_at', 'status'], 'safe'],
         ];
     }
-
 
     /**
      * @param $params
@@ -65,7 +63,6 @@ class UserSearch extends Model
             ->andFilterWhere(['like', 'logged_in_ip', $this->registration_ip])
             ->andFilterWhere(['like', 'logged_in_at', $this->registration_ip])
             ->andFilterWhere(['like', 'status', $this->status]);
-
 
         return $dataProvider;
     }
