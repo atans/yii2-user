@@ -1,6 +1,6 @@
 <?php
 
-namespace atans\user\models\Search;
+namespace atans\user\models\search;
 
 use atans\user\Finder;
 use yii\base\Model;
