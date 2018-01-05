@@ -116,5 +116,5 @@ return [
     'Your account {email} has been confirmed' => '你的帳號{email}已確認',
     'Your email has been changed.' => '你的電郵已更改。',
     'Your new email {email} has been confirmed.' => '你的新電郵{email}已確認',
-    'Your password has been changed on {name}' => '你的{name｝的密碼已更改。',
+    'Your password has been changed on {name}' => '你的{name}的密碼已更改。',
 ];
